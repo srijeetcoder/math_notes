@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-serif: "Merriweather", serif;
+  
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  
+  --color-dark-bg: #0f172a;
+  --color-dark-card: #1e293b;
+  --color-dark-border: #334155;
+}
+
+@layer base {
+  body {
+    @apply antialiased text-slate-800 bg-slate-50 transition-colors duration-200;
+  }
+  
+  .dark body {
+    @apply text-slate-200 bg-dark-bg;
+  }
+}
+
+@layer utilities {
+  .math-display {
+    @apply overflow-x-auto py-2 my-4 text-center text-lg;
+  }
+  
+  .math-inline {
+    @apply mx-1 text-base;
+  }
+}
+
+/* KaTeX custom overrides for dark mode readability if needed */
+.dark .katex {
+  color: #e2e8f0;
+}
