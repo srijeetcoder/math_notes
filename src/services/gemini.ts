@@ -41,8 +41,8 @@ Rules:
 - Do not repeat common textbook examples exactly.
 - Use clear numerical data.
 - Use simple exam language.
-- Include formulas where needed using LaTeX notation (without $ signs).
-- CRITICAL: You MUST double-escape all backslashes in LaTeX formulas so the output is valid JSON. For example, use \\\\frac instead of \\frac, and \\\\sum instead of \\sum.
+- Include formulas where needed using LaTeX notation.
+- CRITICAL JSON ESCAPING RULE: DO NOT use the backslash character (\\) anywhere in your LaTeX formulas or text. Instead, use the word BSLASH. For example, write BSLASHfrac{1}{2} instead of \\frac{1}{2}, and BSLASHsum instead of \\sum. This is mandatory to prevent JSON parsing errors.
 - For every answer, show step by step solution.
 - For MCQ, give 4 options and mention the correct option exactly as it appears in the options list.
 - For short answer, give final answer clearly.
@@ -57,7 +57,7 @@ Return JSON EXACTLY in this format, with no markdown code blocks around it:
       "topic": "Topic name",
       "difficulty": "Difficulty",
       "type": "MCQ or Short Answer",
-      "question": "Question text with math",
+      "question": "Question text with math BSLASHalpha",
       "options": ["A", "B", "C", "D"],
       "answer": "Correct answer",
       "solution": ["Step 1", "Step 2", "Step 3"]
@@ -95,7 +95,10 @@ Return JSON EXACTLY in this format, with no markdown code blocks around it:
     // Parse the JSON. The responseMimeType ensures we get raw JSON, but we'll trim just in case.
     let cleanJson = textResponse.trim().replace(/^\s*```json/i, '').replace(/```\s*$/i, '');
     
-    // Fix common LaTeX unescaped backslashes so JSON.parse doesn't crash
+    // Replace the placeholder BSLASH with double backslash so JSON.parse resolves it to a single backslash
+    cleanJson = cleanJson.replace(/BSLASH/g, '\\\\');
+
+    // Just in case there are any actual stray unescaped backslashes left over
     cleanJson = cleanJson.replace(/\\([^"\\/bfnrtu])/g, '\\\\$1');
 
     return JSON.parse(cleanJson) as QuizResultData;
