@@ -95,39 +95,56 @@ const BrainCircuitIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-5.224 4.668A4 4 0 0 0 4.907 18h14.186a4 4 0 0 0 4.125-5.207 4 4 0 0 0-5.224-4.668A3 3 0 1 0 12 5Z"/><path d="M8.5 12h7"/><path d="M12 8.5v7"/></svg>
 );
 
-export const QuizResult: React.FC<{ quiz: QuizResultData; onRegenerate: () => void }> = ({ quiz, onRegenerate }) => {
+  export const QuizResult: React.FC<{ quiz: QuizResultData; onRegenerate: () => void }> = ({ quiz, onRegenerate }) => {
   const [showSolutions, setShowSolutions] = useState<Record<number, boolean>>({});
+  const [selectedOptions, setSelectedOptions] = useState<Record<number, string>>({});
 
   const toggleSolution = (id: number) => {
     setShowSolutions(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
+  const selectOption = (questionId: number, option: string) => {
+    if (showSolutions[questionId]) return; // prevent changing answer after checking
+    setSelectedOptions(prev => ({ ...prev, [questionId]: option }));
+  };
+
   const copyToClipboard = () => {
     const text = quiz.questions.map((q, i) => `
 Q${i+1}: ${q.question}
-${q.options ? q.options.map(o => `- ${o}`).join('\\n') : ''}
+${q.options ? q.options.map(o => `- ${o}`).join('\n') : ''}
 Answer: ${q.answer}
-Solution: ${q.solution.join(' \\n ')}
-`).join('\\n\\n');
+Solution: ${q.solution.join(' \n ')}
+`).join('\n\n');
     navigator.clipboard.writeText(text);
     alert('Copied to clipboard');
   };
 
   const downloadText = () => {
-    const text = quiz.questions.map((q, i) => `Q${i+1}: ${q.question}\\n${q.options ? q.options.map(o => `- ${o}`).join('\\n') + '\\n' : ''}Answer: ${q.answer}\\nSolution:\\n${q.solution.join('\\n')}`).join('\\n\\n---\\n\\n');
+    const text = quiz.questions.map((q, i) => `Q${i+1}: ${q.question}\n${q.options ? q.options.map(o => `- ${o}`).join('\n') + '\n' : ''}Answer: ${q.answer}\nSolution:\n${q.solution.join('\n')}`).join('\n\n---\n\n');
     const blob = new Blob([text], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${quiz.title.replace(/\\s+/g, '_')}.txt`;
+    a.download = `${quiz.title.replace(/\s+/g, '_')}.txt`;
     a.click();
     URL.revokeObjectURL(url);
   };
 
+  const score = quiz.questions.reduce((acc, q) => acc + (showSolutions[q.id] && selectedOptions[q.id] === q.answer ? 1 : 0), 0);
+  const totalAnswered = Object.keys(showSolutions).filter(id => showSolutions[Number(id)]).length;
+  const allAnswered = totalAnswered === quiz.questions.length;
+
   return (
     <div className="mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
-        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{quiz.title}</h2>
+        <div>
+          <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{quiz.title}</h2>
+          {totalAnswered > 0 && (
+            <p className={`mt-2 font-medium ${allAnswered ? 'text-primary-600 dark:text-primary-400' : 'text-slate-600 dark:text-slate-400'}`}>
+              Score: {score} / {totalAnswered} {allAnswered && '🎉'}
+            </p>
+          )}
+        </div>
         <div className="flex items-center gap-2">
           <button onClick={copyToClipboard} className="p-2 text-slate-600 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-800 rounded-lg transition-colors" title="Copy text"><Copy size={18} /></button>
           <button onClick={downloadText} className="p-2 text-slate-600 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-800 rounded-lg transition-colors" title="Download text"><Download size={18} /></button>
@@ -138,7 +155,11 @@ Solution: ${q.solution.join(' \\n ')}
       </div>
 
       <div className="space-y-6">
-        {quiz.questions.map((q, index) => (
+        {quiz.questions.map((q, index) => {
+          const isRevealed = showSolutions[q.id];
+          const selected = selectedOptions[q.id];
+          
+          return (
           <div key={q.id} className="bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-xl p-5 shadow-sm">
             <div className="flex justify-between items-start mb-3 gap-4">
               <div className="flex items-center gap-2 mb-2">
@@ -150,25 +171,54 @@ Solution: ${q.solution.join(' \\n ')}
               </div>
             </div>
             
-            <div className="text-slate-800 dark:text-slate-200 mb-4 text-lg">
+            <div className="text-slate-800 dark:text-slate-200 mb-5 text-lg">
               <TextWithMath text={q.question} />
             </div>
 
             {q.options && q.options.length > 0 && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-                {q.options.map((opt, i) => (
-                  <div key={i} className="p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300">
-                    <TextWithMath text={opt} />
-                  </div>
-                ))}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+                {q.options.map((opt, i) => {
+                  const isSelected = selected === opt;
+                  const isCorrect = opt === q.answer;
+                  
+                  let btnClass = "p-4 border rounded-xl text-left transition-all duration-200 focus:outline-none ";
+                  
+                  if (isRevealed) {
+                    if (isCorrect) {
+                      btnClass += "bg-green-50 border-green-500 text-green-900 dark:bg-green-900/20 dark:border-green-500 dark:text-green-300 shadow-[0_0_0_1px_rgba(34,197,94,1)]";
+                    } else if (isSelected && !isCorrect) {
+                      btnClass += "bg-red-50 border-red-500 text-red-900 dark:bg-red-900/20 dark:border-red-500 dark:text-red-300 shadow-[0_0_0_1px_rgba(239,68,68,1)] opacity-80";
+                    } else {
+                      btnClass += "border-slate-200 bg-slate-50/50 text-slate-500 dark:border-slate-700 dark:bg-slate-800/30 dark:text-slate-400 opacity-60";
+                    }
+                  } else {
+                    if (isSelected) {
+                      btnClass += "bg-primary-50 border-primary-500 text-primary-900 dark:bg-primary-900/20 dark:border-primary-500 dark:text-primary-300 shadow-[0_0_0_1px_rgba(59,130,246,1)]";
+                    } else {
+                      btnClass += "border-slate-200 bg-white hover:border-primary-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-dark-card dark:hover:border-primary-700/50 dark:hover:bg-slate-800/80 text-slate-700 dark:text-slate-300";
+                    }
+                  }
+
+                  return (
+                    <button 
+                      key={i} 
+                      onClick={() => selectOption(q.id, opt)}
+                      disabled={isRevealed}
+                      className={btnClass}
+                    >
+                      <TextWithMath text={opt} />
+                    </button>
+                  );
+                })}
               </div>
             )}
 
             <button 
               onClick={() => toggleSolution(q.id)}
-              className="text-primary-600 dark:text-primary-400 text-sm font-medium hover:underline focus:outline-none"
+              disabled={!selected && q.options?.length > 0 && !isRevealed}
+              className={`text-sm font-medium focus:outline-none px-4 py-2 rounded-lg transition-colors ${!selected && q.options?.length > 0 && !isRevealed ? 'bg-slate-100 text-slate-400 cursor-not-allowed dark:bg-slate-800 dark:text-slate-500' : 'bg-primary-100 text-primary-700 hover:bg-primary-200 dark:bg-primary-900/30 dark:text-primary-400 dark:hover:bg-primary-900/50'}`}
             >
-              {showSolutions[q.id] ? 'Hide Answer & Solution' : 'Show Answer & Solution'}
+              {isRevealed ? 'Hide Answer & Solution' : 'Check Answer'}
             </button>
 
             {showSolutions[q.id] && (
@@ -188,7 +238,8 @@ Solution: ${q.solution.join(' \\n ')}
               </div>
             )}
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
