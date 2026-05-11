@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { generateQuiz, type QuizResultData } from '../services/gemini';
 import { TextWithMath } from './MathRenderer';
-import { Loader2, Copy, Download, RefreshCw, AlertCircle } from 'lucide-react';
+import { Loader2, Copy, Download, RefreshCw, AlertCircle, ArrowLeft } from 'lucide-react';
 
 export const QuizGenerator: React.FC<{ onQuizGenerated: (quiz: QuizResultData) => void }> = ({ onQuizGenerated }) => {
   const [topic, setTopic] = useState('Basic probability');
@@ -95,9 +95,29 @@ const BrainCircuitIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-5.224 4.668A4 4 0 0 0 4.907 18h14.186a4 4 0 0 0 4.125-5.207 4 4 0 0 0-5.224-4.668A3 3 0 1 0 12 5Z"/><path d="M8.5 12h7"/><path d="M12 8.5v7"/></svg>
 );
 
-  export const QuizResult: React.FC<{ quiz: QuizResultData; onRegenerate: () => void }> = ({ quiz, onRegenerate }) => {
-  const [showSolutions, setShowSolutions] = useState<Record<number, boolean>>({});
-  const [selectedOptions, setSelectedOptions] = useState<Record<number, string>>({});
+export const QuizResult: React.FC<{ quiz: QuizResultData; onBack: () => void }> = ({ quiz, onBack }) => {
+  const [showSolutions, setShowSolutions] = useState<Record<number, boolean>>(() => {
+    if (!quiz.id) return {};
+    const saved = localStorage.getItem(`quiz-state-${quiz.id}-solutions`);
+    return saved ? JSON.parse(saved) : {};
+  });
+  const [selectedOptions, setSelectedOptions] = useState<Record<number, string>>(() => {
+    if (!quiz.id) return {};
+    const saved = localStorage.getItem(`quiz-state-${quiz.id}-options`);
+    return saved ? JSON.parse(saved) : {};
+  });
+
+  useEffect(() => {
+    if (quiz.id) {
+      localStorage.setItem(`quiz-state-${quiz.id}-solutions`, JSON.stringify(showSolutions));
+    }
+  }, [showSolutions, quiz.id]);
+
+  useEffect(() => {
+    if (quiz.id) {
+      localStorage.setItem(`quiz-state-${quiz.id}-options`, JSON.stringify(selectedOptions));
+    }
+  }, [selectedOptions, quiz.id]);
 
   const toggleSolution = (id: number) => {
     setShowSolutions(prev => ({ ...prev, [id]: !prev[id] }));
@@ -148,8 +168,8 @@ Solution: ${q.solution.join(' \n ')}
         <div className="flex items-center gap-2">
           <button onClick={copyToClipboard} className="p-2 text-slate-600 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-800 rounded-lg transition-colors" title="Copy text"><Copy size={18} /></button>
           <button onClick={downloadText} className="p-2 text-slate-600 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-800 rounded-lg transition-colors" title="Download text"><Download size={18} /></button>
-          <button onClick={onRegenerate} className="flex items-center gap-2 px-3 py-2 text-sm font-medium bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-lg transition-colors">
-            <RefreshCw size={16} /> Regenerate
+          <button onClick={onBack} className="flex items-center gap-2 px-3 py-2 text-sm font-medium bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-lg transition-colors">
+            <ArrowLeft size={16} /> Back
           </button>
         </div>
       </div>
