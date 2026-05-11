@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { generateQuiz, type QuizResultData } from '../services/gemini';
 import { TextWithMath } from './MathRenderer';
-import { Loader2, Copy, Download, RefreshCw, AlertCircle, ArrowLeft } from 'lucide-react';
+import { Loader2, Copy, Download, AlertCircle, ArrowLeft } from 'lucide-react';
 
 export const QuizGenerator: React.FC<{ onQuizGenerated: (quiz: QuizResultData) => void }> = ({ onQuizGenerated }) => {
   const [topic, setTopic] = useState('Basic probability');
