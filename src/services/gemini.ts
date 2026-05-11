@@ -97,11 +97,16 @@ Return JSON EXACTLY in this format, with no markdown code blocks around it:
     // Parse the JSON. The responseMimeType ensures we get raw JSON, but we'll trim just in case.
     let cleanJson = textResponse.trim().replace(/^\s*```json/i, '').replace(/```\s*$/i, '');
     
-    // Replace the placeholder BSLASH with double backslash so JSON.parse resolves it to a single backslash
-    // This safely avoids all JSON parsing errors with LaTeX
-    cleanJson = cleanJson.replace(/BSLASH/g, '\\\\');
-
-    return JSON.parse(cleanJson) as QuizResultData;
+    let parsedJson = cleanJson.replace(/BSLASH/g, '\\\\');
+    
+    try {
+      return JSON.parse(parsedJson) as QuizResultData;
+    } catch (parseError) {
+      console.warn("Initial JSON parse failed, attempting fallback cleanup for backslashes.");
+      // Fallback: escape single backslashes that aren't escaping quotes or themselves
+      parsedJson = parsedJson.replace(/(?<!\\)\\(?![\\"])/g, '\\\\');
+      return JSON.parse(parsedJson) as QuizResultData;
+    }
   } catch (error) {
     console.error("Error generating quiz:", error);
     throw error;
