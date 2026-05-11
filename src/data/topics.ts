@@ -56,7 +56,7 @@ export const topics: Topic[] = [
     practiceQuestion: {
       id: 'prac-bp-1',
       text: 'If P(A) = 0.6, P(B) = 0.5, and A and B are independent, find P(A ∪ B).',
-      solution: 'Since A and B are independent: P(A \\cap B) = P(A)P(B) = 0.6 \\times 0.5 = 0.3 \\\\ Then, P(A \\cup B) = P(A) + P(B) - P(A \\cap B) = 0.6 + 0.5 - 0.3 = 0.8'
+      solution: '\\text{Since A and B are independent: } P(A \\cap B) = P(A)P(B) = 0.6 \\times 0.5 = 0.3 \\\\ \\text{Then, } P(A \\cup B) = P(A) + P(B) - P(A \\cap B) = 0.6 + 0.5 - 0.3 = 0.8'
     }
   },
   {
@@ -79,7 +79,7 @@ export const topics: Topic[] = [
       {
         title: 'Basic Conditional',
         problem: 'Given P(A) = 0.4, P(B) = 0.3, P(A ∪ B) = 0.5, find P(A | B).',
-        solution: 'First, find P(A \\cap B): \\\\ P(A \\cap B) = P(A) + P(B) - P(A \\cup B) = 0.4 + 0.3 - 0.5 = 0.2 \\\\ Then, P(A | B) = \\frac{P(A \\cap B)}{P(B)} = \\frac{0.2}{0.3} = \\frac{2}{3}'
+        solution: '\\text{First, find } P(A \\cap B): \\\\ P(A \\cap B) = P(A) + P(B) - P(A \\cup B) = 0.4 + 0.3 - 0.5 = 0.2 \\\\ \\text{Then, } P(A | B) = \\frac{P(A \\cap B)}{P(B)} = \\frac{0.2}{0.3} = \\frac{2}{3}'
       }
     ],
     commonMistakes: [
@@ -89,7 +89,7 @@ export const topics: Topic[] = [
     practiceQuestion: {
       id: 'prac-cp-1',
       text: 'A die is rolled. What is the probability that it shows a 2, given that it shows an even number?',
-      solution: 'Let A = getting a 2, B = getting an even number. \\\\ P(B) = \\frac{3}{6} = \\frac{1}{2} \\\\ P(A \\cap B) = P(\\text{getting a 2}) = \\frac{1}{6} \\\\ P(A | B) = \\frac{P(A \\cap B)}{P(B)} = \\frac{1/6}{1/2} = \\frac{1}{3}'
+      solution: '\\text{Let } A = \\text{getting a 2, } B = \\text{getting an even number.} \\\\ P(B) = \\frac{3}{6} = \\frac{1}{2} \\\\ P(A \\cap B) = P(\\text{getting a 2}) = \\frac{1}{6} \\\\ P(A | B) = \\frac{P(A \\cap B)}{P(B)} = \\frac{1/6}{1/2} = \\frac{1}{3}'
     }
   },
   {
@@ -112,7 +112,7 @@ export const topics: Topic[] = [
       {
         title: 'Two Boxes Problem',
         problem: 'Box 1 has 4 white and 3 red balls. Box 2 has 3 white and 7 red balls. A box is selected randomly and one ball is drawn. Find the probability that it came from Box 1 given that it is white.',
-        solution: 'Let B_1, B_2 be choosing Box 1, Box 2. P(B_1) = \\frac{1}{2}, P(B_2) = \\frac{1}{2}. \\\\ Let W be drawing a white ball. \\\\ P(W | B_1) = \\frac{4}{7}, \\quad P(W | B_2) = \\frac{3}{10} \\\\ P(W) = P(B_1)P(W | B_1) + P(B_2)P(W | B_2) = \\left(\\frac{1}{2} \\times \\frac{4}{7}\\right) + \\left(\\frac{1}{2} \\times \\frac{3}{10}\\right) = \\frac{2}{7} + \\frac{3}{20} = \\frac{61}{140} \\\\ P(B_1 | W) = \\frac{P(B_1)P(W | B_1)}{P(W)} = \\frac{2/7}{61/140} = \\frac{40}{61}'
+        solution: '\\text{Let } B_1, B_2 \\text{ be choosing Box 1, Box 2. } P(B_1) = \\frac{1}{2}, P(B_2) = \\frac{1}{2}. \\\\ \\text{Let } W \\text{ be drawing a white ball.} \\\\ P(W | B_1) = \\frac{4}{7}, \\quad P(W | B_2) = \\frac{3}{10} \\\\ P(W) = P(B_1)P(W | B_1) + P(B_2)P(W | B_2) = \\left(\\frac{1}{2} \\times \\frac{4}{7}\\right) + \\left(\\frac{1}{2} \\times \\frac{3}{10}\\right) = \\frac{2}{7} + \\frac{3}{20} = \\frac{61}{140} \\\\ P(B_1 | W) = \\frac{P(B_1)P(W | B_1)}{P(W)} = \\frac{2/7}{61/140} = \\frac{40}{61}'
       }
     ],
     commonMistakes: [
@@ -250,7 +250,7 @@ export const topics: Topic[] = [
       {
         title: 'Formula Usage',
         problem: 'Given Σx = 0, Σy = 0, Σxy = 12, Σx² = 10, Σy² = 20. Find r.',
-        solution: 'Since \\Sigma x = 0 \\text{ and } \\Sigma y = 0, \\text{ deviations are already zero-centered.} \\\\ r = \\frac{\\Sigma xy}{\\sqrt{\\Sigma x^2 \\Sigma y^2}} = \\frac{12}{\\sqrt{10 \\times 20}} = \\frac{12}{\\sqrt{200}} \\approx 0.848'
+        solution: '\\text{Since } \\Sigma x = 0 \\text{ and } \\Sigma y = 0, \\text{ deviations are already zero-centered.} \\\\ r = \\frac{\\Sigma xy}{\\sqrt{\\Sigma x^2 \\Sigma y^2}} = \\frac{12}{\\sqrt{10 \\times 20}} = \\frac{12}{\\sqrt{200}} \\approx 0.848'
       }
     ],
     commonMistakes: [
@@ -284,7 +284,7 @@ export const topics: Topic[] = [
       {
         title: 'Regression Coefficients',
         problem: 'Given b_yx = -0.4 and b_xy = -0.9. Find the correlation coefficient r.',
-        solution: 'Since both regression coefficients are negative, r must be negative. \\\\ r = -\\sqrt{(-0.4)(-0.9)} = -\\sqrt{0.36} = -0.6'
+        solution: '\\text{Since both regression coefficients are negative, r must be negative.} \\\\ r = -\\sqrt{(-0.4)(-0.9)} = -\\sqrt{0.36} = -0.6'
       }
     ],
     commonMistakes: [

@@ -53,7 +53,7 @@ export const PracticeQuestion: React.FC<{ id: string; text: string; solution: st
             {completed ? <CheckCircle size={24} /> : <Circle size={24} />}
           </button>
           
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-2 flex items-center gap-2">
               <span className="bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider">Practice</span>
             </h4>
