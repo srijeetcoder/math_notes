@@ -41,7 +41,7 @@ Rules:
 - Do not repeat common textbook examples exactly.
 - Use clear numerical data.
 - Use simple exam language.
-- Include formulas where needed using LaTeX notation.
+- Include formulas where needed using LaTeX notation. YOU MUST WRAP ALL MATH FORMULAS IN $ FOR INLINE MATH OR $$ FOR BLOCK MATH. IMPORTANT: DO NOT wrap regular English text in $. Only wrap actual mathematical symbols, equations, and numbers. For example, write "The value is $BSLASHalpha$" instead of "$The value is BSLASHalpha$".
 - CRITICAL JSON ESCAPING RULE: DO NOT use the backslash character (\\) anywhere in your LaTeX formulas or text. Instead, use the word BSLASH. For example, write BSLASHfrac{1}{2} instead of \\frac{1}{2}, and BSLASHsum instead of \\sum. This is mandatory to prevent JSON parsing errors.
 - For every answer, show step by step solution.
 - For MCQ, give 4 options and mention the correct option exactly as it appears in the options list.

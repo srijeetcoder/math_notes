@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { generateQuiz, type QuizResultData } from '../services/gemini';
-import { MathRenderer } from './MathRenderer';
+import { MathRenderer, TextWithMath } from './MathRenderer';
 import { Loader2, Copy, Download, RefreshCw, AlertCircle } from 'lucide-react';
 
 export const QuizGenerator: React.FC<{ onQuizGenerated: (quiz: QuizResultData) => void }> = ({ onQuizGenerated }) => {
@@ -151,14 +151,14 @@ Solution: ${q.solution.join(' \\n ')}
             </div>
             
             <div className="text-slate-800 dark:text-slate-200 mb-4 text-lg">
-              <MathRenderer math={q.question} />
+              <TextWithMath text={q.question} />
             </div>
 
             {q.options && q.options.length > 0 && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
                 {q.options.map((opt, i) => (
                   <div key={i} className="p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300">
-                    <MathRenderer math={opt} />
+                    <TextWithMath text={opt} />
                   </div>
                 ))}
               </div>
@@ -174,14 +174,14 @@ Solution: ${q.solution.join(' \\n ')}
             {showSolutions[q.id] && (
               <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 animate-in fade-in duration-300">
                 <div className="mb-3 font-semibold text-slate-800 dark:text-slate-200">
-                  Answer: <span className="text-green-600 dark:text-green-400"><MathRenderer math={q.answer} inline /></span>
+                  Answer: <span className="text-green-600 dark:text-green-400"><TextWithMath text={q.answer} /></span>
                 </div>
                 <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-lg text-slate-700 dark:text-slate-300 space-y-2">
                   <h5 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Step-by-step Solution:</h5>
                   {q.solution.map((step, i) => (
                     <div key={i} className="flex gap-3">
                       <span className="text-slate-400 dark:text-slate-500 select-none">{i+1}.</span>
-                      <MathRenderer math={step} />
+                      <TextWithMath text={step} />
                     </div>
                   ))}
                 </div>
