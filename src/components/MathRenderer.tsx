@@ -21,9 +21,11 @@ export const MathRenderer: React.FC<MathRendererProps> = ({ math, inline = false
     }
   }, [math, inline]);
 
+  const Tag = inline ? 'span' : 'div';
+
   return (
-    <span
-      className={`${inline ? 'math-inline' : 'math-display'} ${className}`}
+    <Tag
+      className={`${inline ? 'math-inline' : 'math-display'} ${className} ${!inline ? 'w-full overflow-x-auto overflow-y-hidden' : ''}`}
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );

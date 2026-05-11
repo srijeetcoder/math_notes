@@ -15,8 +15,8 @@ export const TopicCard: React.FC<{ title: string; priority: string; description:
 
 export const FormulaCard: React.FC<{ title: string; expression: string; explanation: string; whenToUse: string }> = ({ title, expression, explanation, whenToUse }) => (
   <div className="bg-white dark:bg-dark-card rounded-xl border border-slate-200 dark:border-dark-border shadow-sm overflow-hidden flex flex-col h-full">
-    <div className="bg-slate-50 dark:bg-slate-800/50 p-4 border-b border-slate-200 dark:border-dark-border flex justify-center items-center overflow-x-auto">
-      <MathRenderer math={expression} />
+    <div className="bg-slate-50 dark:bg-slate-800/50 p-4 border-b border-slate-200 dark:border-dark-border overflow-x-auto w-full text-center">
+      <MathRenderer math={expression} className="mx-auto" />
     </div>
     <div className="p-4 flex-1 flex flex-col gap-3">
       <h4 className="font-bold text-slate-800 dark:text-slate-200">{title}</h4>
