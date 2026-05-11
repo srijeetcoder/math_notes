@@ -29,12 +29,26 @@
 
 @layer utilities {
   .math-display {
-    @apply overflow-x-auto py-2 my-4 text-center text-lg;
+    @apply block overflow-x-auto py-2 my-4 text-lg max-w-full;
   }
   
   .math-inline {
     @apply mx-1 text-base;
   }
+}
+
+/* Fix KaTeX horizontal overflow so it doesn't truncate on the left */
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+  padding-bottom: 0.5rem;
+  padding-top: 0.5rem;
+}
+
+/* Ensure wide formulas don't center-overflow */
+.katex-display > .katex {
+  text-align: left !important;
 }
 
 /* KaTeX custom overrides for dark mode readability if needed */

@@ -135,7 +135,7 @@ export const TopicPage: React.FC = () => {
               </div>
               <div className="divide-y divide-slate-100 dark:divide-slate-800/50">
                 {topicFormulas.map(f => (
-                  <div key={f.id} className="p-4 flex flex-col items-center gap-2 w-full overflow-hidden">
+                  <div key={f.id} className="p-4 flex flex-col gap-2 w-full max-w-full overflow-x-auto">
                     <MathRenderer math={f.expression} />
                     <span className="text-xs text-slate-500 text-center">{f.title}</span>
                   </div>
