@@ -193,9 +193,9 @@ Solution: ${q.solution.join(' \n ')}
                     }
                   } else {
                     if (isSelected) {
-                      btnClass += "bg-primary-50 border-primary-500 text-primary-900 dark:bg-primary-900/20 dark:border-primary-500 dark:text-primary-300 shadow-[0_0_0_1px_rgba(59,130,246,1)]";
+                      btnClass += "bg-teal-50 border-teal-500 text-teal-900 dark:bg-teal-900/20 dark:border-teal-500 dark:text-teal-300 shadow-[0_0_0_1px_rgba(20,184,166,1)]";
                     } else {
-                      btnClass += "border-slate-200 bg-white hover:border-primary-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-dark-card dark:hover:border-primary-700/50 dark:hover:bg-slate-800/80 text-slate-700 dark:text-slate-300";
+                      btnClass += "border-slate-200 bg-white hover:border-teal-300 hover:bg-slate-50 dark:border-slate-700 dark:bg-dark-card dark:hover:border-teal-700/50 dark:hover:bg-slate-800/80 text-slate-700 dark:text-slate-300";
                     }
                   }
 
