@@ -42,6 +42,7 @@ Rules:
 - Use clear numerical data.
 - Use simple exam language.
 - Include formulas where needed using LaTeX notation (without $ signs).
+- CRITICAL: You MUST double-escape all backslashes in LaTeX formulas so the output is valid JSON. For example, use \\\\frac instead of \\frac, and \\\\sum instead of \\sum.
 - For every answer, show step by step solution.
 - For MCQ, give 4 options and mention the correct option exactly as it appears in the options list.
 - For short answer, give final answer clearly.
@@ -92,7 +93,11 @@ Return JSON EXACTLY in this format, with no markdown code blocks around it:
     const textResponse = data.candidates[0].content.parts[0].text;
     
     // Parse the JSON. The responseMimeType ensures we get raw JSON, but we'll trim just in case.
-    const cleanJson = textResponse.trim().replace(/^\s*```json/i, '').replace(/```\s*$/i, '');
+    let cleanJson = textResponse.trim().replace(/^\s*```json/i, '').replace(/```\s*$/i, '');
+    
+    // Fix common LaTeX unescaped backslashes so JSON.parse doesn't crash
+    cleanJson = cleanJson.replace(/\\([^"\\/bfnrtu])/g, '\\\\$1');
+
     return JSON.parse(cleanJson) as QuizResultData;
   } catch (error) {
     console.error("Error generating quiz:", error);
