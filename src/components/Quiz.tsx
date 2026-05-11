@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { generateQuiz, type QuizResultData } from '../services/gemini';
-import { MathRenderer, TextWithMath } from './MathRenderer';
+import { TextWithMath } from './MathRenderer';
 import { Loader2, Copy, Download, RefreshCw, AlertCircle } from 'lucide-react';
 
 export const QuizGenerator: React.FC<{ onQuizGenerated: (quiz: QuizResultData) => void }> = ({ onQuizGenerated }) => {
@@ -215,8 +215,8 @@ Solution: ${q.solution.join(' \n ')}
 
             <button 
               onClick={() => toggleSolution(q.id)}
-              disabled={!selected && q.options?.length > 0 && !isRevealed}
-              className={`text-sm font-medium focus:outline-none px-4 py-2 rounded-lg transition-colors ${!selected && q.options?.length > 0 && !isRevealed ? 'bg-slate-100 text-slate-400 cursor-not-allowed dark:bg-slate-800 dark:text-slate-500' : 'bg-primary-100 text-primary-700 hover:bg-primary-200 dark:bg-primary-900/30 dark:text-primary-400 dark:hover:bg-primary-900/50'}`}
+              disabled={!selected && (q.options?.length ?? 0) > 0 && !isRevealed}
+              className={`text-sm font-medium focus:outline-none px-4 py-2 rounded-lg transition-colors ${!selected && (q.options?.length ?? 0) > 0 && !isRevealed ? 'bg-slate-100 text-slate-400 cursor-not-allowed dark:bg-slate-800 dark:text-slate-500' : 'bg-teal-100 text-teal-700 hover:bg-teal-200 dark:bg-teal-900/30 dark:text-teal-400 dark:hover:bg-teal-900/50'}`}
             >
               {isRevealed ? 'Hide Answer & Solution' : 'Check Answer'}
             </button>
