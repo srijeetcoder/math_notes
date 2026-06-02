@@ -72,14 +72,16 @@ export const Auth: React.FC = () => {
 
         if (error) throw error;
 
-        if (data.user && data.session) {
-          // Instantly logged in (e.g. email verification disabled)
-          setSuccessMsg('Account created successfully!');
-          setTimeout(() => navigate(from, { replace: true }), 1500);
-        } else {
-          // Email confirmation required
-          setSuccessMsg('Registration successful! Please check your email inbox to confirm your account.');
-          setEmail('');
+        if (data.user) {
+          if (data.session) {
+            // Sign out immediately because signUp auto-logs the user in when email confirmation is disabled
+            await supabase.auth.signOut();
+            setSuccessMsg('Account created successfully! Please sign in with your credentials.');
+          } else {
+            // Email confirmation required
+            setSuccessMsg('Registration successful! Please check your email inbox to confirm your account, then sign in.');
+          }
+          setIsSignUp(false);
           setPassword('');
           setFullName('');
         }

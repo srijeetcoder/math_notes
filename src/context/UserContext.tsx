@@ -68,7 +68,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
           setUser(session.user);
-          await loadUserData(session.user.id);
+          await loadUserData(session.user.id, session.user);
         } else {
           // Initialize states with Guest progress
           setSyllabusProgress(getGuestSyllabusProgress());
@@ -87,7 +87,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
         setUser(session.user);
-        await loadUserData(session.user.id);
+        await loadUserData(session.user.id, session.user);
       } else {
         setUser(null);
         setProfile(null);
@@ -105,18 +105,41 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   // Fetch all user details from database when authenticated
-  const loadUserData = async (userId: string) => {
+  const loadUserData = async (userId: string, currentUser?: User | null) => {
     setLoading(true);
     try {
-      // 1. Fetch Profile
+      // 1. Fetch Profile (using maybeSingle to handle missing profiles gracefully)
       const { data: profileData, error: profileErr } = await supabase
         .from('profiles')
         .select('full_name')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
       
-      if (profileData) {
-        setProfile(profileData);
+      let finalProfile = profileData;
+      const activeUser = currentUser || user;
+
+      if (!profileData && activeUser) {
+        // Profile is missing from the database. Create it using metadata
+        const fullNameFromMeta = activeUser.user_metadata?.full_name || '';
+        const { data: insertedData, error: insertErr } = await supabase
+          .from('profiles')
+          .insert({
+            id: userId,
+            full_name: fullNameFromMeta,
+            updated_at: new Date().toISOString()
+          })
+          .select('full_name')
+          .maybeSingle();
+
+        if (insertedData) {
+          finalProfile = insertedData;
+        } else {
+          console.error('Error inserting missing profile:', insertErr);
+        }
+      }
+      
+      if (finalProfile) {
+        setProfile(finalProfile);
       } else if (profileErr) {
         console.error('Error fetching profile:', profileErr);
       }

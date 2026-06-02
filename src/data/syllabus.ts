@@ -49,7 +49,7 @@ export const syllabus: SyllabusUnit[] = [
     number: 1,
     title: 'Basic Probability',
     hours: 11,
-    status: 'Completed',
+    status: 'Pending',
     topics: [
       { name: 'Probability spaces', topicId: 'basic-probability' },
       { name: 'Conditional probability', topicId: 'conditional-probability' },
@@ -72,7 +72,7 @@ export const syllabus: SyllabusUnit[] = [
     number: 2,
     title: 'Continuous Probability Distributions',
     hours: 4,
-    status: 'Completed',
+    status: 'Pending',
     topics: [
       { name: 'Continuous random variables and their properties', topicId: 'pmf-pdf-cdf' },
       { name: 'Distribution functions and densities', topicId: 'pmf-pdf-cdf' },
@@ -86,7 +86,7 @@ export const syllabus: SyllabusUnit[] = [
     number: 3,
     title: 'Bivariate Distributions',
     hours: 5,
-    status: 'Completed',
+    status: 'Pending',
     topics: [
       { name: 'Bivariate distributions and their properties', topicId: 'bivariate-distributions' },
       { name: 'Distribution of sums and quotients', topicId: 'bivariate-distributions' },
@@ -99,7 +99,7 @@ export const syllabus: SyllabusUnit[] = [
     number: 4,
     title: 'Basic Statistics',
     hours: 8,
-    status: 'In Progress',
+    status: 'Pending',
     statusLabel: 'Completed up to Rank Correlation',
     topics: [
       { name: 'Measures of central tendency', topicId: 'central-tendency-moments' },
