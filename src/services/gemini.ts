@@ -29,7 +29,7 @@ export async function generateQuiz(
   }
 
   const prompt = `
-You are a BSM201 Probability and Statistics CA3 exam question generator for MAKAUT first year engineering students.
+You are a MAKAUT Second Semester Mathematics question generator for first year engineering students.
 
 Generate unique exam style questions only from these topics:
 Basic probability, conditional probability, Bayes theorem, PMF, PDF, CDF, expectation, variance, binomial distribution, correlation coefficient, regression lines, Spearman rank correlation.
@@ -48,7 +48,7 @@ Rules:
 - For every answer, show step by step solution.
 - For MCQ, give 4 options and mention the correct option exactly as it appears in the options list.
 - For short answer, give final answer clearly.
-- Keep the level suitable for BSM201 CA3.
+- Keep the level suitable for MAKAUT Second Semester Mathematics.
 
 Return JSON EXACTLY in this format, with no markdown code blocks around it:
 {
@@ -95,13 +95,13 @@ Return JSON EXACTLY in this format, with no markdown code blocks around it:
     const textResponse = data.candidates[0].content.parts[0].text;
     
     // Parse the JSON. The responseMimeType ensures we get raw JSON, but we'll trim just in case.
-    let cleanJson = textResponse.trim().replace(/^\s*```json/i, '').replace(/```\s*$/i, '');
+    const cleanJson = textResponse.trim().replace(/^\s*```json/i, '').replace(/```\s*$/i, '');
     
     let parsedJson = cleanJson.replace(/BSLASH/g, '\\\\');
     
     try {
       return JSON.parse(parsedJson) as QuizResultData;
-    } catch (parseError) {
+    } catch {
       console.warn("Initial JSON parse failed, attempting fallback cleanup for backslashes.");
       // Fallback: escape single backslashes that aren't escaping quotes or themselves
       parsedJson = parsedJson.replace(/(?<!\\)\\(?![\\"])/g, '\\\\');

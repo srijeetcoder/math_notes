@@ -1,22 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { QuizGenerator, QuizResult } from '../components/Quiz';
 import { type QuizResultData } from '../services/gemini';
 import { Clock, Trash2, ArrowRight } from 'lucide-react';
 
 export const QuizPage: React.FC = () => {
   const [activeQuiz, setActiveQuiz] = useState<QuizResultData | null>(null);
-  const [history, setHistory] = useState<QuizResultData[]>([]);
-
-  useEffect(() => {
+  const [history, setHistory] = useState<QuizResultData[]>(() => {
     const saved = localStorage.getItem('quiz-history');
     if (saved) {
       try {
-        setHistory(JSON.parse(saved));
+        return JSON.parse(saved);
       } catch (e) {
         console.error(e);
       }
     }
-  }, []);
+    return [];
+  });
 
   const saveHistory = (newHistory: QuizResultData[]) => {
     setHistory(newHistory);

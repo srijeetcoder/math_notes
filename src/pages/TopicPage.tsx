@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { topics } from '../data/topics';
 import { formulas } from '../data/formulas';
-import { MathRenderer } from '../components/MathRenderer';
+import { MathRenderer, TextWithMath } from '../components/MathRenderer';
 import { SolvedExample, PracticeQuestion } from '../components/InteractiveLearning';
 import { BinomialCalculator } from '../components/BinomialCalculator';
 import { PMFCalculator, CDFBuilder } from '../components/Calculators';
@@ -13,14 +13,10 @@ export const TopicPage: React.FC = () => {
   const topic = topics.find(t => t.id === id);
   const topicFormulas = formulas.filter(f => f.topicId === id);
   
-  const [isRevised, setIsRevised] = useState(false);
-
-  useEffect(() => {
-    if (topic) {
-      const revised = localStorage.getItem(`topic-revised-${topic.id}`) === 'true';
-      setIsRevised(revised);
-    }
-  }, [topic]);
+  const [isRevised, setIsRevised] = useState(() => {
+    if (!id) return false;
+    return localStorage.getItem(`topic-revised-${id}`) === 'true';
+  });
 
   if (!topic) {
     return <Navigate to="/" replace />;
@@ -39,7 +35,7 @@ export const TopicPage: React.FC = () => {
   const isPracDone = localStorage.getItem(`prac-done-${topic.practiceQuestion.id}`) === 'true';
 
   return (
-    <div className="animate-in fade-in duration-500 max-w-4xl mx-auto">
+    <div key={id} className="animate-in fade-in duration-500 max-w-4xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-8">
         <div>
           <div className="flex items-center gap-3 mb-2">
@@ -48,7 +44,7 @@ export const TopicPage: React.FC = () => {
               {topic.priority} Priority
             </span>
           </div>
-          <p className="text-lg text-slate-600 dark:text-slate-400">{topic.conceptExplanation}</p>
+          <div className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed"><TextWithMath text={topic.conceptExplanation} /></div>
         </div>
         
         <button 
@@ -67,7 +63,7 @@ export const TopicPage: React.FC = () => {
             <h2 className="text-xl font-bold mb-4 text-slate-800 dark:text-slate-100 border-b border-slate-100 dark:border-slate-800 pb-2">Step-by-Step Method</h2>
             <ol className="list-decimal list-inside space-y-3 text-slate-700 dark:text-slate-300">
               {topic.stepByStepMethod.map((step, i) => (
-                <li key={i} className="pl-2">{step}</li>
+                <li key={i} className="pl-2"><TextWithMath text={step} /></li>
               ))}
             </ol>
           </section>
@@ -123,7 +119,7 @@ export const TopicPage: React.FC = () => {
             <h3 className="font-bold text-red-800 dark:text-red-400 mb-2 uppercase tracking-wider text-sm">Common Mistakes</h3>
             <ul className="list-disc list-inside space-y-2 text-red-900 dark:text-red-300 text-sm">
               {topic.commonMistakes.map((mistake, i) => (
-                <li key={i}>{mistake}</li>
+                <li key={i}><TextWithMath text={mistake} /></li>
               ))}
             </ul>
           </section>

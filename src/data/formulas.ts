@@ -135,5 +135,101 @@ export const formulas: Formula[] = [
     expression: "\\rho = 1 - \\frac{6\\sum d^2}{n(n^2 - 1)}",
     explanation: 'Correlation based on ranks. d is the difference between ranks for a pair.',
     whenToUse: 'When data is ranked or asked for Spearman correlation.'
+  },
+  {
+    id: 'f-ci-1',
+    topicId: 'chebyshev-inequality',
+    title: 'Chebyshev\'s Inequality',
+    expression: "P(|X - \\mu| \\ge k\\sigma) \\le \\frac{1}{k^2}",
+    explanation: 'Calculates the upper bound on the probability that a random variable lies outside k standard deviations from the mean.',
+    whenToUse: 'When the underlying probability distribution is unknown, but you have the mean and standard deviation.'
+  },
+  {
+    id: 'f-pn-1',
+    topicId: 'poisson-normal',
+    title: 'Poisson PMF',
+    expression: "P(X = x) = \\frac{e^{-\\lambda}\\lambda^x}{x!}",
+    explanation: 'Calculates discrete probabilities for events occurring at a constant average rate λ.',
+    whenToUse: 'When events occur independently at a known constant average rate per unit interval.'
+  },
+  {
+    id: 'f-pn-2',
+    topicId: 'poisson-normal',
+    title: 'Standard Normal Z-Score',
+    expression: "z = \\frac{x - \\mu}{\\sigma}",
+    explanation: 'Standardizes any normal random variable X into a Standard Normal variable Z with mean 0 and variance 1.',
+    whenToUse: 'When performing calculations with normal probability densities.'
+  },
+  {
+    id: 'f-bd-1',
+    topicId: 'bivariate-distributions',
+    title: 'Conditional Density',
+    expression: "f_{X|Y}(x|y) = \\frac{f(x, y)}{f_Y(y)}",
+    explanation: 'Calculates the conditional probability density of X given Y has already occurred.',
+    whenToUse: 'When calculating conditional probabilities in a bivariate continuous distribution.'
+  },
+  {
+    id: 'f-ctm-1',
+    topicId: 'central-tendency-moments',
+    title: 'Skewness Coefficient (Beta 1)',
+    expression: "\\beta_1 = \\frac{\\mu_3^2}{\\mu_2^3}",
+    explanation: 'Measures the degree of asymmetry of a distribution. A value of 0 indicates a symmetrical distribution.',
+    whenToUse: 'When analyzing the skewness or asymmetry of data.'
+  },
+  {
+    id: 'f-ctm-2',
+    topicId: 'central-tendency-moments',
+    title: 'Kurtosis Coefficient (Beta 2)',
+    expression: "\\beta_2 = \\frac{\\mu_4}{\\mu_2^2}",
+    explanation: 'Measures the tailedness of a probability distribution. A value of 3 indicates a normal (mesokurtic) distribution.',
+    whenToUse: 'When analyzing the heaviness of tails or peakedness of a distribution.'
+  },
+  {
+    id: 'f-cf-1',
+    topicId: 'curve-fitting',
+    title: 'Least Squares Linear Equations',
+    expression: "a \\sum x^2 + b \\sum x = \\sum xy, \\quad a \\sum x + nb = \\sum y",
+    explanation: 'Normal equations utilized to determine slope "a" and intercept "b" for the best fit line y = ax + b.',
+    whenToUse: 'When fitting a straight line to paired coordinates.'
+  },
+  {
+    id: 'f-ls-1',
+    topicId: 'large-samples',
+    title: 'Single Mean Z-Test',
+    expression: "Z = \\frac{\\bar{x} - \\mu_0}{\\sigma / \\sqrt{n}}",
+    explanation: 'Z-score statistic testing if a sample mean differs significantly from a hypothesized population mean.',
+    whenToUse: 'When sample size is large (n ≥ 30) and testing single population mean.'
+  },
+  {
+    id: 'f-ls-2',
+    topicId: 'large-samples',
+    title: 'Single Proportion Z-Test',
+    expression: "Z = \\frac{p - P_0}{\\sqrt{P_0 Q_0 / n}}",
+    explanation: 'Z-score statistic testing if a sample proportion differs significantly from a hypothesized population proportion.',
+    whenToUse: 'When sample size is large (n ≥ 30) and testing single population proportion.'
+  },
+  {
+    id: 'f-ss-1',
+    topicId: 'small-samples',
+    title: 'Small Sample t-Test',
+    expression: "t = \\frac{\\bar{x} - \\mu_0}{s / \\sqrt{n}}",
+    explanation: 'Student\'s t-statistic utilized for small sample sizes to test single population mean.',
+    whenToUse: 'When sample size is small (n < 30) and standard deviation is estimated from the sample.'
+  },
+  {
+    id: 'f-ss-2',
+    topicId: 'small-samples',
+    title: 'F-Test for Variance Ratio',
+    expression: "F = \\frac{S_1^2}{S_2^2}",
+    explanation: 'Calculates the ratio of two sample variances to test if the two population variances are equal.',
+    whenToUse: 'When comparing variances of two normal populations with small samples (n < 30).'
+  },
+  {
+    id: 'f-cst-1',
+    topicId: 'chi-square-tests',
+    title: 'Chi-Square Test statistic',
+    expression: "\\chi^2 = \\sum \\frac{(O_i - E_i)^2}{E_i}",
+    explanation: 'Measures the difference between observed frequencies (Oi) and expected frequencies (Ei).',
+    whenToUse: 'When performing goodness-of-fit tests or independence-of-attributes tests for categorical data.'
   }
 ];

@@ -16,7 +16,7 @@ export const FormulaSheet: React.FC = () => {
     <div className="animate-in fade-in duration-500">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">Formula Sheet</h1>
-        <p className="text-slate-600 dark:text-slate-400">All the important formulas you need for the CA3 exam in one place.</p>
+        <p className="text-slate-600 dark:text-slate-400">All the important formulas you need for the Second Semester Mathematics exam in one place.</p>
       </div>
 
       <div className="relative mb-8 max-w-xl">

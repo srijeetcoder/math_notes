@@ -1,129 +1,240 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { topics } from '../data/topics';
-import { formulas } from '../data/formulas';
-import { TopicCard, FormulaCard, ProgressCard } from '../components/ContentCards';
-import { Clock, BrainCircuit, PlayCircle } from 'lucide-react';
+import React from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { syllabus, courseDetails } from '../data/syllabus';
+import { BrainCircuit, PlayCircle, CheckCircle2, Clock, AlertCircle, Calendar, Award, BookOpen, GraduationCap } from 'lucide-react';
 
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
-  const [completedTopics, setCompletedTopics] = useState(0);
-  const [completedPractice, setCompletedPractice] = useState(0);
+
+  // Dynamic calculations from syllabus data
+  const totalUnits = syllabus.length;
+  const completedUnits = syllabus.filter(u => u.status === 'Completed').length;
+  const inProgressUnits = syllabus.filter(u => u.status === 'In Progress').length;
   
-  // Calculate exam countdown (placeholder: 3 days from now if not set)
-  const [timeLeft, setTimeLeft] = useState('');
-  
-  useEffect(() => {
-    // Check localStorage for progress
-    let tCount = 0;
-    let pCount = 0;
-    
-    topics.forEach(t => {
-      if (localStorage.getItem(`topic-revised-${t.id}`) === 'true') tCount++;
-      if (localStorage.getItem(`prac-done-${t.practiceQuestion.id}`) === 'true') pCount++;
-    });
-    
-    setCompletedTopics(tCount);
-    setCompletedPractice(pCount);
-
-    // Mock exam date: Tomorrow 10 AM
-    const examDate = new Date();
-    examDate.setDate(examDate.getDate() + 1);
-    examDate.setHours(10, 0, 0, 0);
-
-    const updateTimer = () => {
-      const now = new Date();
-      const diff = examDate.getTime() - now.getTime();
-      if (diff <= 0) {
-        setTimeLeft('Exam Started!');
-        return;
-      }
-      const h = Math.floor((diff / (1000 * 60 * 60)));
-      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      setTimeLeft(`${h}h ${m}m left`);
-    };
-
-    updateTimer();
-    const interval = setInterval(updateTimer, 60000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const highPriorityTopics = topics.filter(t => t.priority === 'High').slice(0, 3);
-  const quickFormulas = formulas.slice(0, 3); // Just grabbing first 3 for quick view
+  // Progress = (Completed + 0.5 * InProgress) / Total
+  const calculatedProgress = completedUnits + (inProgressUnits * 0.5);
+  const progressPercentage = Math.round((calculatedProgress / totalUnits) * 100);
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-br from-primary-600 to-primary-800 rounded-2xl p-6 md:p-8 text-white shadow-lg relative overflow-hidden">
+    <div className="space-y-8 animate-in fade-in duration-500 text-zinc-900 dark:text-zinc-100">
+      
+      {/* Course Details Info Card at the Top */}
+      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-md relative overflow-hidden">
+        {/* Decorative background glow in dark mode */}
+        <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-600/5 dark:bg-violet-600/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
+        
         <div className="relative z-10">
-          <h2 className="text-2xl md:text-3xl font-bold mb-2">Ready to crush CA3?</h2>
-          <p className="text-primary-100 mb-6 max-w-lg">Your exam is approaching fast. Review high-yield topics, practice targeted questions, and test your knowledge with AI generated quizzes.</p>
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between border-b border-zinc-100 dark:border-zinc-800/80 pb-4 mb-5 gap-4">
+            <div>
+              <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-violet-500/10 text-indigo-600 dark:text-violet-400 border border-indigo-100 dark:border-violet-500/20">
+                  {courseDetails.code}
+                </span>
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                  {courseDetails.semester} Semester
+                </span>
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                  {courseDetails.type}
+                </span>
+              </div>
+              <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-white">
+                {courseDetails.title}
+              </h2>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+                {courseDetails.university} <span className="text-xs text-zinc-400">({courseDetails.universitySubText})</span>
+              </p>
+            </div>
+            
+            <div className="text-left lg:text-right">
+              <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">Program</span>
+              <span className="font-bold text-zinc-800 dark:text-zinc-200 text-sm md:text-base">{courseDetails.program}</span>
+              <span className="text-xs text-zinc-400 block mt-1">{courseDetails.academicSession}</span>
+            </div>
+          </div>
+
+          {/* Metadata Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 text-sm">
+            <div className="bg-zinc-50 dark:bg-zinc-950/50 p-3.5 rounded-xl border border-zinc-100 dark:border-zinc-900/60">
+              <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block mb-1">Designation</span>
+              <span className="font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5">
+                <Award className="text-indigo-500 dark:text-violet-400 shrink-0" size={16} />
+                {courseDetails.designation}
+              </span>
+            </div>
+            <div className="bg-zinc-50 dark:bg-zinc-950/50 p-3.5 rounded-xl border border-zinc-100 dark:border-zinc-900/60">
+              <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block mb-1">Contact Hours</span>
+              <span className="font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5">
+                <BookOpen className="text-indigo-500 dark:text-violet-400 shrink-0" size={16} />
+                {courseDetails.contactHours}
+              </span>
+            </div>
+            <div className="bg-zinc-50 dark:bg-zinc-950/50 p-3.5 rounded-xl border border-zinc-100 dark:border-zinc-900/60">
+              <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block mb-1">Continuous Assessment</span>
+              <span className="font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5">
+                <Calendar className="text-indigo-500 dark:text-violet-400 shrink-0" size={16} />
+                {courseDetails.continuousAssessmentMarks} Marks
+              </span>
+            </div>
+            <div className="bg-zinc-50 dark:bg-zinc-950/50 p-3.5 rounded-xl border border-zinc-100 dark:border-zinc-900/60">
+              <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block mb-1">Final Exam</span>
+              <span className="font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5">
+                <GraduationCap className="text-indigo-500 dark:text-violet-400 shrink-0" size={16} />
+                {courseDetails.finalExamMarks} Marks
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-6 flex flex-wrap gap-3">
             <button 
               onClick={() => navigate('/revision-plan')}
-              className="bg-white text-primary-700 hover:bg-slate-50 px-5 py-2.5 rounded-lg font-semibold flex items-center gap-2 transition-colors shadow-sm"
+              className="bg-indigo-600 hover:bg-indigo-700 dark:bg-white dark:text-black dark:hover:bg-zinc-200 text-white px-5 py-2.5 rounded-xl font-semibold flex items-center gap-2 transition-all shadow-sm active:scale-95 cursor-pointer text-sm"
             >
-              <PlayCircle size={20} /> Start 2-Hour Revision
+              <PlayCircle size={18} /> Start Revision Plan
             </button>
             <button 
               onClick={() => navigate('/quiz')}
-              className="bg-primary-500 hover:bg-primary-400 text-white border border-primary-400/50 px-5 py-2.5 rounded-lg font-semibold flex items-center gap-2 transition-colors"
+              className="bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-white border border-zinc-200 dark:border-zinc-750 px-5 py-2.5 rounded-xl font-semibold flex items-center gap-2 transition-all active:scale-95 cursor-pointer text-sm"
             >
-              <BrainCircuit size={20} /> Generate Quiz
+              <BrainCircuit size={18} /> Practice AI Quiz
             </button>
           </div>
         </div>
-        
-        {/* Countdown Badge */}
-        <div className="absolute top-6 right-6 bg-white/20 backdrop-blur-md border border-white/30 rounded-xl p-4 text-center hidden sm:block">
-          <Clock size={24} className="mx-auto mb-1 text-white" />
-          <div className="text-xs font-semibold uppercase tracking-wider text-primary-100 mb-1">Exam In</div>
-          <div className="text-xl font-bold font-mono">{timeLeft}</div>
-        </div>
       </div>
 
-      {/* Progress Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <ProgressCard label="Topics Revised" value={completedTopics} total={topics.length} color="bg-primary-500" />
-        <ProgressCard label="Practice Questions" value={completedPractice} total={topics.length} color="bg-green-500" />
-      </div>
-
-      {/* High Priority Topics */}
-      <div>
-        <div className="flex justify-between items-end mb-4">
-          <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100">High Priority Topics</h3>
-          <Link to="/practice" className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">View All Topics</Link>
+      {/* Syllabus Progress Card */}
+      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-md">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          <div>
+            <h3 className="text-lg font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+              Syllabus Completion
+            </h3>
+            <p className="text-zinc-500 dark:text-zinc-400 text-sm mt-1">
+              Calculated dynamically: {completedUnits} completed units, {inProgressUnits} in progress unit (50% weight) out of {totalUnits} total units.
+            </p>
+          </div>
+          
+          <div className="flex items-center gap-2 self-start md:self-auto bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-4 py-2 rounded-xl text-sm font-semibold">
+            <CheckCircle2 size={16} />
+            Completed up to Rank Correlation
+          </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {highPriorityTopics.map(topic => (
-            <TopicCard 
-              key={topic.id}
-              title={topic.title}
-              priority={topic.priority}
-              description={topic.conceptExplanation.substring(0, 80) + '...'}
-              to={`/topic/${topic.id}`}
-              onClick={() => navigate(`/topic/${topic.id}`)}
+
+        {/* Custom Progress Bar */}
+        <div className="space-y-3">
+          <div className="flex justify-between text-sm font-medium">
+            <span className="text-zinc-500 dark:text-zinc-400">Progress ({calculatedProgress} / {totalUnits} Units Tracked)</span>
+            <span className="text-zinc-900 dark:text-white font-mono">{progressPercentage}%</span>
+          </div>
+          <div className="w-full bg-zinc-200 dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-full h-4 overflow-hidden p-0.5">
+            <div 
+              className="bg-gradient-to-r from-indigo-600 to-violet-500 dark:from-violet-600 dark:to-indigo-500 h-2.5 rounded-full transition-all duration-1000 ease-out shadow-[0_0_12px_rgba(139,92,246,0.3)]" 
+              style={{ width: `${progressPercentage}%` }}
             />
-          ))}
+          </div>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-zinc-150 dark:border-zinc-800/60 text-center">
+          <div>
+            <div className="text-xl md:text-2xl font-bold text-zinc-900 dark:text-white font-mono">{completedUnits}</div>
+            <div className="text-xs text-zinc-500 uppercase tracking-wider mt-1">Completed Units</div>
+          </div>
+          <div className="border-x border-zinc-150 dark:border-zinc-800/60">
+            <div className="text-xl md:text-2xl font-bold text-indigo-600 dark:text-violet-400 font-mono">{inProgressUnits}</div>
+            <div className="text-xs text-zinc-500 uppercase tracking-wider mt-1">In Progress</div>
+          </div>
+          <div>
+            <div className="text-xl md:text-2xl font-bold text-zinc-500 dark:text-zinc-400 font-mono">
+              {syllabus.filter(u => u.status === 'Pending').length}
+            </div>
+            <div className="text-xs text-zinc-500 uppercase tracking-wider mt-1">Pending</div>
+          </div>
         </div>
       </div>
 
-      {/* Quick Formulas */}
-      <div>
-        <div className="flex justify-between items-end mb-4">
-          <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100">Quick Formulas</h3>
-          <Link to="/formulas" className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline">View Formula Sheet</Link>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {quickFormulas.map(formula => (
-            <FormulaCard 
-              key={formula.id}
-              title={formula.title}
-              expression={formula.expression}
-              explanation={formula.explanation}
-              whenToUse={formula.whenToUse}
-            />
-          ))}
+      {/* Syllabus Units Grid */}
+      <div className="space-y-6">
+        <h3 className="text-xl font-bold text-zinc-900 dark:text-white">Syllabus Breakdown</h3>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {syllabus.map((unit) => {
+            const isCompleted = unit.status === 'Completed';
+            const isInProgress = unit.status === 'In Progress';
+            
+            return (
+              <div 
+                key={unit.id}
+                className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 hover:border-zinc-350 dark:hover:border-zinc-700 transition-all flex flex-col justify-between shadow-sm"
+              >
+                <div>
+                  <div className="flex justify-between items-start gap-4 mb-4">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
+                          Unit {unit.number}
+                        </span>
+                        {unit.hours && (
+                          <span className="text-xs text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800/50 px-2 py-0.5 rounded">
+                            {unit.hours} Hours
+                          </span>
+                        )}
+                      </div>
+                      <h4 className="text-lg font-bold text-zinc-900 dark:text-white mt-1">
+                        {unit.title}
+                      </h4>
+                    </div>
+
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${
+                      isCompleted 
+                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' 
+                        : isInProgress 
+                          ? 'bg-indigo-500/10 text-indigo-600 dark:bg-violet-500/10 dark:text-violet-400 border border-indigo-500/20 dark:border-violet-500/20' 
+                          : 'bg-zinc-100 dark:bg-zinc-950 text-zinc-500 border border-zinc-200 dark:border-zinc-850'
+                    }`}>
+                      {isCompleted && <CheckCircle2 size={12} />}
+                      {isInProgress && <Clock size={12} />}
+                      {!isCompleted && !isInProgress && <AlertCircle size={12} />}
+                      {unit.statusLabel || unit.status}
+                    </span>
+                  </div>
+
+                  {/* Topics List */}
+                  <div className="space-y-2 mt-4">
+                    <span className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Topics covered:</span>
+                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 pt-1">
+                      {unit.topics.map((topic, i) => (
+                        <li key={i} className="text-sm flex items-start gap-2 text-zinc-700 dark:text-zinc-300">
+                          <span className="text-zinc-400 dark:text-zinc-650 mt-1.5 shrink-0">•</span>
+                          {topic.topicId ? (
+                            <Link 
+                              to={`/topic/${topic.topicId}`}
+                              className="text-indigo-600 dark:text-violet-400 hover:text-indigo-700 dark:hover:text-violet-300 hover:underline transition-colors text-left"
+                            >
+                              {topic.name}
+                            </Link>
+                          ) : (
+                            <span className="text-zinc-600 dark:text-zinc-450 text-left">{topic.name}</span>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Quick actions for units that are completed/in progress */}
+                {(isCompleted || isInProgress) && (
+                  <div className="mt-6 pt-4 border-t border-zinc-100 dark:border-zinc-800/60 flex justify-between items-center gap-4 text-xs">
+                    <span className="text-zinc-400 dark:text-zinc-500">Interactive study material is available.</span>
+                    <Link 
+                      to="/practice" 
+                      className="text-indigo-600 dark:text-violet-400 hover:text-indigo-700 dark:hover:text-violet-300 font-semibold flex items-center gap-1"
+                    >
+                      Go to Practice &rarr;
+                    </Link>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MathRenderer } from './MathRenderer';
+import { MathRenderer, TextWithMath } from './MathRenderer';
 import { CheckCircle, Circle, Eye, EyeOff } from 'lucide-react';
 
 export const SolvedExample: React.FC<{ title: string; problem: string; solution: string }> = ({ title, problem, solution }) => {
@@ -17,7 +17,7 @@ export const SolvedExample: React.FC<{ title: string; problem: string; solution:
         </button>
       </div>
       <div className="p-5">
-        <p className="text-slate-700 dark:text-slate-300 mb-4">{problem}</p>
+        <div className="text-slate-700 dark:text-slate-300 mb-4"><TextWithMath text={problem} /></div>
         
         {showSolution && (
           <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -57,7 +57,7 @@ export const PracticeQuestion: React.FC<{ id: string; text: string; solution: st
             <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-2 flex items-center gap-2">
               <span className="bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider">Practice</span>
             </h4>
-            <p className="text-slate-700 dark:text-slate-300 mb-4">{text}</p>
+            <div className="text-slate-700 dark:text-slate-300 mb-4"><TextWithMath text={text} /></div>
             
             <div className="flex gap-3">
               <button 

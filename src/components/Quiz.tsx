@@ -17,8 +17,9 @@ export const QuizGenerator: React.FC<{ onQuizGenerated: (quiz: QuizResultData) =
     try {
       const quiz = await generateQuiz(topic, difficulty, count, type);
       onQuizGenerated(quiz);
-    } catch (err: any) {
-      setError(err.message || 'Failed to generate quiz.');
+    } catch (err) {
+      const errorObj = err as Error;
+      setError(errorObj.message || 'Failed to generate quiz.');
     } finally {
       setLoading(false);
     }

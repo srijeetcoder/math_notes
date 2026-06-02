@@ -102,11 +102,11 @@ export const CDFBuilder: React.FC = () => {
   const isValid = Math.abs(totalP - 1) < 0.0001;
 
   // Calculate cumulative probabilities
-  let currentSum = 0;
-  const cdfData = data.map(row => {
-    currentSum += row.p;
-    return { x: row.x, Fx: currentSum };
-  });
+  const cdfData = data.reduce<Array<{x: number, Fx: number}>>((acc, row) => {
+    const prevSum = acc.length > 0 ? acc[acc.length - 1].Fx : 0;
+    acc.push({ x: row.x, Fx: prevSum + row.p });
+    return acc;
+  }, []);
 
   return (
     <div className="bg-white dark:bg-dark-card p-6 rounded-xl border border-slate-200 dark:border-dark-border shadow-sm mt-6">

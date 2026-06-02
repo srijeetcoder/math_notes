@@ -19,14 +19,15 @@ export const BinomialCalculator: React.FC = () => {
   const [mode, setMode] = useState<'exact' | 'atMost' | 'atLeast'>('exact');
 
   const calculate = () => {
-    let prob = 0;
-    let steps = '';
     const q = 1 - p;
     
     if (n < 0 || p < 0 || p > 1 || x < 0 || x > n) {
       return { prob: null, steps: 'Invalid inputs.' };
     }
 
+    let prob: number;
+    let steps: string;
+    
     if (mode === 'exact') {
       const c = combinations(n, x);
       prob = c * Math.pow(p, x) * Math.pow(q, n - x);
@@ -95,7 +96,7 @@ export const BinomialCalculator: React.FC = () => {
         </div>
         <div>
           <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Mode</label>
-          <select value={mode} onChange={e => setMode(e.target.value as any)} className="w-full p-2 border border-slate-300 dark:border-dark-border rounded bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
+          <select value={mode} onChange={e => setMode(e.target.value as 'exact' | 'atMost' | 'atLeast')} className="w-full p-2 border border-slate-300 dark:border-dark-border rounded bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
             <option value="exact">Exactly x ( X = x )</option>
             <option value="atMost">At most x ( X ≤ x )</option>
             <option value="atLeast">At least x ( X ≥ x )</option>
