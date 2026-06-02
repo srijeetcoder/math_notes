@@ -1,15 +1,23 @@
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { syllabus, courseDetails } from '../data/syllabus';
-import { BrainCircuit, PlayCircle, CheckCircle2, Clock, AlertCircle, Calendar, Award, BookOpen, GraduationCap } from 'lucide-react';
+import { BrainCircuit, PlayCircle, CheckCircle2, Calendar, Award, BookOpen, GraduationCap } from 'lucide-react';
+import { useUser } from '../context/UserContext';
+import type { UnitStatus } from '../context/UserContext';
 
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
+  const { syllabusProgress, updateSyllabusStatus } = useUser();
+
+  // Helper to fetch current unit status from state
+  const getUnitStatus = (unitId: string): UnitStatus => {
+    return syllabusProgress[unitId] || 'Pending';
+  };
 
   // Dynamic calculations from syllabus data
   const totalUnits = syllabus.length;
-  const completedUnits = syllabus.filter(u => u.status === 'Completed').length;
-  const inProgressUnits = syllabus.filter(u => u.status === 'In Progress').length;
+  const completedUnits = syllabus.filter(u => getUnitStatus(u.id) === 'Completed').length;
+  const inProgressUnits = syllabus.filter(u => getUnitStatus(u.id) === 'In Progress').length;
   
   // Progress = (Completed + 0.5 * InProgress) / Total
   const calculatedProgress = completedUnits + (inProgressUnits * 0.5);
@@ -115,7 +123,7 @@ export const Dashboard: React.FC = () => {
           
           <div className="flex items-center gap-2 self-start md:self-auto bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-4 py-2 rounded-xl text-sm font-semibold">
             <CheckCircle2 size={16} />
-            Completed up to Rank Correlation
+            Study Tracker Connected
           </div>
         </div>
 
@@ -145,7 +153,7 @@ export const Dashboard: React.FC = () => {
           </div>
           <div>
             <div className="text-xl md:text-2xl font-bold text-zinc-500 dark:text-zinc-400 font-mono">
-              {syllabus.filter(u => u.status === 'Pending').length}
+              {syllabus.filter(u => getUnitStatus(u.id) === 'Pending').length}
             </div>
             <div className="text-xs text-zinc-500 uppercase tracking-wider mt-1">Pending</div>
           </div>
@@ -157,8 +165,9 @@ export const Dashboard: React.FC = () => {
         <h3 className="text-xl font-bold text-zinc-900 dark:text-white">Syllabus Breakdown</h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {syllabus.map((unit) => {
-            const isCompleted = unit.status === 'Completed';
-            const isInProgress = unit.status === 'In Progress';
+            const currentStatus = getUnitStatus(unit.id);
+            const isCompleted = currentStatus === 'Completed';
+            const isInProgress = currentStatus === 'In Progress';
             
             return (
               <div 
@@ -183,18 +192,29 @@ export const Dashboard: React.FC = () => {
                       </h4>
                     </div>
 
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${
-                      isCompleted 
-                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' 
-                        : isInProgress 
-                          ? 'bg-indigo-500/10 text-indigo-600 dark:bg-violet-500/10 dark:text-violet-400 border border-indigo-500/20 dark:border-violet-500/20' 
-                          : 'bg-zinc-100 dark:bg-zinc-950 text-zinc-500 border border-zinc-200 dark:border-zinc-850'
-                    }`}>
-                      {isCompleted && <CheckCircle2 size={12} />}
-                      {isInProgress && <Clock size={12} />}
-                      {!isCompleted && !isInProgress && <AlertCircle size={12} />}
-                      {unit.statusLabel || unit.status}
-                    </span>
+                    <div className="relative">
+                      <select
+                        value={currentStatus}
+                        onChange={(e) => updateSyllabusStatus(unit.id, e.target.value as UnitStatus)}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap border cursor-pointer outline-none transition-all hover:scale-105 active:scale-95 appearance-none pr-8 relative ${
+                          isCompleted 
+                            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' 
+                            : isInProgress 
+                              ? 'bg-indigo-500/10 text-indigo-600 dark:bg-violet-500/10 dark:text-violet-400 border-indigo-500/20 dark:border-violet-500/20' 
+                              : 'bg-zinc-100 dark:bg-zinc-950 text-zinc-500 border-zinc-200 dark:border-zinc-850'
+                        }`}
+                        style={{
+                          backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>")`,
+                          backgroundRepeat: 'no-repeat',
+                          backgroundPosition: 'right 8px center',
+                          backgroundSize: '14px'
+                        }}
+                      >
+                        <option value="Completed" className="bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 font-sans">Completed</option>
+                        <option value="In Progress" className="bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 font-sans">In Progress</option>
+                        <option value="Pending" className="bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 font-sans">Pending</option>
+                      </select>
+                    </div>
                   </div>
 
                   {/* Topics List */}
@@ -240,3 +260,4 @@ export const Dashboard: React.FC = () => {
     </div>
   );
 };
+

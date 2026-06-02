@@ -1,20 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { lastNightPlan } from '../data/revisionPlan';
 import { CheckCircle, Circle, Clock } from 'lucide-react';
+import { useUser } from '../context/UserContext';
 
 export const RevisionPlanPage: React.FC = () => {
-  const [completedSessions, setCompletedSessions] = useState<Record<string, boolean>>(() => {
-    const saved = localStorage.getItem('revision-plan-progress');
-    return saved ? JSON.parse(saved) : {};
-  });
+  const { revisionProgress, toggleRevisionSession } = useUser();
 
-  const toggleSession = (id: string) => {
-    const newSessions = { ...completedSessions, [id]: !completedSessions[id] };
-    setCompletedSessions(newSessions);
-    localStorage.setItem('revision-plan-progress', JSON.stringify(newSessions));
+  const toggleSession = async (id: string) => {
+    await toggleRevisionSession(id);
   };
 
-  const progress = Math.round((Object.values(completedSessions).filter(Boolean).length / lastNightPlan.length) * 100) || 0;
+  const progress = Math.round((Object.values(revisionProgress).filter(Boolean).length / lastNightPlan.length) * 100) || 0;
 
   return (
     <div className="animate-in fade-in duration-500 max-w-3xl mx-auto">
@@ -35,7 +31,7 @@ export const RevisionPlanPage: React.FC = () => {
 
       <div className="relative border-l-2 border-slate-200 dark:border-slate-800 ml-4 md:ml-6 space-y-8 pb-4">
         {lastNightPlan.map((session) => {
-          const isCompleted = completedSessions[session.id];
+          const isCompleted = !!revisionProgress[session.id];
           return (
             <div key={session.id} className="relative pl-8 md:pl-10">
               <button 

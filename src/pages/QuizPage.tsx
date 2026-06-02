@@ -2,34 +2,20 @@ import React, { useState } from 'react';
 import { QuizGenerator, QuizResult } from '../components/Quiz';
 import { type QuizResultData } from '../services/gemini';
 import { Clock, Trash2, ArrowRight } from 'lucide-react';
+import { useUser } from '../context/UserContext';
 
 export const QuizPage: React.FC = () => {
   const [activeQuiz, setActiveQuiz] = useState<QuizResultData | null>(null);
-  const [history, setHistory] = useState<QuizResultData[]>(() => {
-    const saved = localStorage.getItem('quiz-history');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    return [];
-  });
+  const { quizHistory, saveQuiz, deleteQuiz } = useUser();
 
-  const saveHistory = (newHistory: QuizResultData[]) => {
-    setHistory(newHistory);
-    localStorage.setItem('quiz-history', JSON.stringify(newHistory));
-  };
-
-  const handleQuizGenerated = (quiz: QuizResultData) => {
+  const handleQuizGenerated = async (quiz: QuizResultData) => {
     const newQuiz = { ...quiz, id: Date.now().toString(), createdAt: Date.now() };
     setActiveQuiz(newQuiz);
-    saveHistory([newQuiz, ...history]);
+    await saveQuiz(newQuiz);
   };
 
-  const deleteQuiz = (id: string) => {
-    saveHistory(history.filter(q => q.id !== id));
+  const handleDeleteQuiz = async (id: string) => {
+    await deleteQuiz(id);
     if (activeQuiz?.id === id) {
       setActiveQuiz(null);
     }
@@ -48,7 +34,7 @@ export const QuizPage: React.FC = () => {
         <div className="space-y-10">
           <QuizGenerator onQuizGenerated={handleQuizGenerated} />
           
-          {history.length > 0 && (
+          {quizHistory.length > 0 && (
             <div className="bg-white dark:bg-dark-card border border-slate-200 dark:border-dark-border rounded-xl p-6 shadow-sm">
               <h3 className="font-bold text-xl mb-6 text-slate-800 dark:text-slate-100 flex items-center gap-2">
                 <Clock size={20} className="text-slate-500" />
@@ -56,8 +42,8 @@ export const QuizPage: React.FC = () => {
               </h3>
               
               <div className="space-y-3">
-                {history.map((quiz) => (
-                  <div key={quiz.id} className="flex items-center justify-between p-4 rounded-lg border border-slate-200 dark:border-dark-border hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                {quizHistory.map((quiz) => (
+                   <div key={quiz.id} className="flex items-center justify-between p-4 rounded-lg border border-slate-200 dark:border-dark-border hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                     <div>
                       <h4 className="font-semibold text-slate-800 dark:text-slate-200">{quiz.title}</h4>
                       <div className="text-sm text-slate-500 dark:text-slate-400 mt-1">
@@ -67,7 +53,7 @@ export const QuizPage: React.FC = () => {
                     
                     <div className="flex items-center gap-3">
                       <button 
-                        onClick={() => deleteQuiz(quiz.id!)}
+                        onClick={() => handleDeleteQuiz(quiz.id!)}
                         className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                         title="Delete quiz"
                       >
