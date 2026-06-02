@@ -9,7 +9,7 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
   const navItems = [
-    { name: 'Dashboard', path: '/', icon: LayoutDashboard },
+    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Formula Sheet', path: '/formulas', icon: BookOpen },
     { name: 'Practice', path: '/practice', icon: Calculator },
     { name: 'AI Quiz', path: '/quiz', icon: BrainCircuit },
