@@ -21,6 +21,7 @@ interface UserContextType {
   deleteQuiz: (quizId: string) => Promise<void>;
   toggleRevisionSession: (sessionId: string) => Promise<void>;
   logout: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -307,6 +308,21 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await supabase.auth.signOut();
   };
 
+  const deleteAccount = async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      const { error } = await supabase.rpc('delete_user_account');
+      if (error) throw error;
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.error('Failed to delete account:', err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -320,7 +336,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         saveQuiz,
         deleteQuiz,
         toggleRevisionSession,
-        logout
+        logout,
+        deleteAccount
       }}
     >
       {children}

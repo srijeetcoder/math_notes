@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Menu, LogIn, LogOut, Cloud, ChevronDown } from 'lucide-react';
+import { Menu, LogIn, LogOut, Cloud, ChevronDown, Trash2 } from 'lucide-react';
 import { DarkModeToggle } from './DarkModeToggle';
 import { Sidebar } from './Sidebar';
 import { useUser } from '../context/UserContext';
@@ -11,10 +11,21 @@ interface LayoutProps {
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { user, profile, logout } = useUser();
+  const { user, profile, logout, deleteAccount } = useUser();
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Collapsed state for desktop sidebar
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    return localStorage.getItem('sidebar-collapsed') === 'true';
+  });
+
+  const toggleSidebar = () => {
+    const val = !sidebarCollapsed;
+    setSidebarCollapsed(val);
+    localStorage.setItem('sidebar-collapsed', String(val));
+  };
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -44,14 +55,23 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black text-zinc-900 dark:text-zinc-100 flex">
-      <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
+      <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} isCollapsed={sidebarCollapsed} />
       
-      <div className="flex-1 flex flex-col lg:pl-64 min-w-0 transition-all duration-300">
+      <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ${sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-64'}`}>
         <header className="sticky top-0 z-10 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-900 px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
+            {/* Mobile menu trigger */}
             <button 
-              className="lg:hidden p-2 -ml-2 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300"
+              className="lg:hidden p-2 -ml-2 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-300 cursor-pointer"
               onClick={() => setSidebarOpen(true)}
+            >
+              <Menu size={24} />
+            </button>
+            {/* Desktop collapse toggle */}
+            <button 
+              className="hidden lg:flex p-2 -ml-2 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-650 dark:text-zinc-300 cursor-pointer"
+              onClick={toggleSidebar}
+              title={sidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
             >
               <Menu size={24} />
             </button>
@@ -101,10 +121,28 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                           await logout();
                           navigate('/');
                         }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 border border-transparent transition-colors text-left text-sm font-semibold cursor-pointer"
+                      >
+                        <LogOut size={16} className="text-zinc-500" />
+                        <span>Sign Out</span>
+                      </button>
+
+                      <button
+                        onClick={async () => {
+                          setDropdownOpen(false);
+                          if (window.confirm("Are you absolutely sure you want to delete your account? This action is permanent and will delete all your synced data.")) {
+                            try {
+                              await deleteAccount();
+                              navigate('/');
+                            } catch (err) {
+                              alert("Failed to delete account. Please ensure the Supabase RPC function is configured.");
+                            }
+                          }
+                        }}
                         className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-red-600 dark:text-red-400 hover:bg-red-500/5 hover:border-red-500/10 border border-transparent transition-colors text-left text-sm font-semibold cursor-pointer"
                       >
-                        <LogOut size={16} />
-                        <span>Sign Out</span>
+                        <Trash2 size={16} />
+                        <span>Delete Account</span>
                       </button>
                     </div>
                   </div>

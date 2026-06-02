@@ -7,7 +7,9 @@ export const Auth: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(() => {
+    return !!(location.state as any)?.isSignUp;
+  });
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
