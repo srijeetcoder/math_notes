@@ -11,7 +11,7 @@ export const Dashboard: React.FC = () => {
 
   // Helper to fetch current unit status from state
   const getUnitStatus = (unitId: string): UnitStatus => {
-    return syllabusProgress[unitId] || 'Pending';
+    return syllabusProgress[unitId] || (syllabus.find(u => u.id === unitId)?.status as UnitStatus) || 'Pending';
   };
 
   // Dynamic calculations from syllabus data

@@ -2,7 +2,6 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../services/supabase';
 import type { QuizResultData } from '../services/gemini';
-import { syllabus as defaultSyllabus } from '../data/syllabus';
 
 export type UnitStatus = 'Completed' | 'In Progress' | 'Pending';
 
@@ -26,32 +25,25 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-// Initial syllabus progress maps from the default static file
-const getInitialSyllabusProgress = (): Record<string, UnitStatus> => {
-  const saved = localStorage.getItem('syllabus-progress');
-  if (saved) {
-    try { return JSON.parse(saved); } catch (e) { console.error(e); }
-  }
-  // Fallback to defaults defined in syllabus.ts
-  const initial: Record<string, UnitStatus> = {};
-  defaultSyllabus.forEach(unit => {
-    initial[unit.id] = unit.status;
-  });
-  return initial;
-};
-
-// Initial revision progress maps from the default local storage
-const getInitialRevisionProgress = (): Record<string, boolean> => {
-  const saved = localStorage.getItem('revision-plan-progress');
+// Guest Initializers (used when logged out)
+const getGuestSyllabusProgress = (): Record<string, UnitStatus> => {
+  const saved = localStorage.getItem('guest-syllabus-progress');
   if (saved) {
     try { return JSON.parse(saved); } catch (e) { console.error(e); }
   }
   return {};
 };
 
-// Initial quiz history maps from the default local storage
-const getInitialQuizHistory = (): QuizResultData[] => {
-  const saved = localStorage.getItem('quiz-history');
+const getGuestRevisionProgress = (): Record<string, boolean> => {
+  const saved = localStorage.getItem('guest-revision-progress');
+  if (saved) {
+    try { return JSON.parse(saved); } catch (e) { console.error(e); }
+  }
+  return {};
+};
+
+const getGuestQuizHistory = (): QuizResultData[] => {
+  const saved = localStorage.getItem('guest-quiz-history');
   if (saved) {
     try { return JSON.parse(saved); } catch (e) { console.error(e); }
   }
@@ -64,9 +56,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   // App tracking states
-  const [syllabusProgress, setSyllabusProgress] = useState<Record<string, UnitStatus>>(getInitialSyllabusProgress);
-  const [quizHistory, setQuizHistory] = useState<QuizResultData[]>(getInitialQuizHistory);
-  const [revisionProgress, setRevisionProgress] = useState<Record<string, boolean>>(getInitialRevisionProgress);
+  const [syllabusProgress, setSyllabusProgress] = useState<Record<string, UnitStatus>>({});
+  const [quizHistory, setQuizHistory] = useState<QuizResultData[]>([]);
+  const [revisionProgress, setRevisionProgress] = useState<Record<string, boolean>>({});
 
   // Monitor Supabase Auth state changes
   useEffect(() => {
@@ -77,6 +69,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUser(session.user);
           await loadUserData(session.user.id);
         } else {
+          // Initialize states with Guest progress
+          setSyllabusProgress(getGuestSyllabusProgress());
+          setQuizHistory(getGuestQuizHistory());
+          setRevisionProgress(getGuestRevisionProgress());
           setLoading(false);
         }
       } catch (err) {
@@ -94,10 +90,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         setUser(null);
         setProfile(null);
-        // Reset states to local storage equivalents
-        setSyllabusProgress(getInitialSyllabusProgress());
-        setQuizHistory(getInitialQuizHistory());
-        setRevisionProgress(getInitialRevisionProgress());
+        // Reset states to Guest progress
+        setSyllabusProgress(getGuestSyllabusProgress());
+        setQuizHistory(getGuestQuizHistory());
+        setRevisionProgress(getGuestRevisionProgress());
         setLoading(false);
       }
     });
@@ -141,21 +137,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
         setSyllabusProgress(dbSyllabus);
       } else {
-        // No records in DB, if we have local storage data, sync it to the DB!
-        const localSyllabus = getInitialSyllabusProgress();
-        const insertRows = Object.keys(localSyllabus).map(unitId => ({
-          user_id: userId,
-          unit_id: unitId,
-          status: localSyllabus[unitId]
-        }));
-
-        if (insertRows.length > 0) {
-          const { error: syncErr } = await supabase
-            .from('syllabus_progress')
-            .upsert(insertRows);
-          if (syncErr) console.error('Error syncing local progress to DB:', syncErr);
-        }
-        dbSyllabus = localSyllabus;
+        // No records in DB, initialize empty for this user (they fall back to default syllabus values)
+        setSyllabusProgress({});
       }
 
       // 3. Fetch Quiz History
@@ -178,22 +161,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }));
         setQuizHistory(formattedQuizzes);
       } else {
-        // Sync local storage quiz history if any
-        const localQuizzes = getInitialQuizHistory();
-        if (localQuizzes.length > 0) {
-          const insertRows = localQuizzes.map(quiz => ({
-            id: quiz.id || Date.now().toString() + Math.random().toString(36).substr(2, 9),
-            user_id: userId,
-            title: quiz.title,
-            questions: quiz.questions,
-            created_at: quiz.createdAt || Date.now()
-          }));
-          const { error: syncErr } = await supabase
-            .from('quiz_history')
-            .insert(insertRows);
-          if (syncErr) console.error('Error syncing local quizzes to DB:', syncErr);
-          setQuizHistory(localQuizzes);
-        }
+        setQuizHistory([]);
       }
 
       // 4. Fetch Revision Checklist
@@ -213,20 +181,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
         setRevisionProgress(dbRevision);
       } else {
-        // Sync local storage revision plan
-        const localRevision = getInitialRevisionProgress();
-        const insertRows = Object.keys(localRevision).map(sessionId => ({
-          user_id: userId,
-          session_id: sessionId,
-          completed: localRevision[sessionId]
-        }));
-        if (insertRows.length > 0) {
-          const { error: syncErr } = await supabase
-            .from('revision_progress')
-            .upsert(insertRows);
-          if (syncErr) console.error('Error syncing local revision checklist to DB:', syncErr);
-        }
-        setRevisionProgress(localRevision);
+        setRevisionProgress({});
       }
 
     } catch (err) {
@@ -241,7 +196,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Update local state first
     const updated = { ...syllabusProgress, [unitId]: status };
     setSyllabusProgress(updated);
-    localStorage.setItem('syllabus-progress', JSON.stringify(updated));
 
     // Update cloud if logged in
     if (user) {
@@ -259,6 +213,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } catch (err) {
         console.error('Failed to sync syllabus status to DB:', err);
       }
+    } else {
+      // Guest mode: Save only to guest local storage
+      localStorage.setItem('guest-syllabus-progress', JSON.stringify(updated));
     }
   };
 
@@ -272,7 +229,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     const updated = [newQuiz, ...quizHistory];
     setQuizHistory(updated);
-    localStorage.setItem('quiz-history', JSON.stringify(updated));
 
     if (user) {
       try {
@@ -290,6 +246,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } catch (err) {
         console.error('Failed to save quiz to DB:', err);
       }
+    } else {
+      // Guest mode: Save only to guest local storage
+      localStorage.setItem('guest-quiz-history', JSON.stringify(updated));
     }
   };
 
@@ -297,7 +256,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const deleteQuiz = async (quizId: string) => {
     const updated = quizHistory.filter(q => q.id !== quizId);
     setQuizHistory(updated);
-    localStorage.setItem('quiz-history', JSON.stringify(updated));
 
     if (user) {
       try {
@@ -311,6 +269,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } catch (err) {
         console.error('Failed to delete quiz from DB:', err);
       }
+    } else {
+      // Guest mode: Delete only from guest local storage
+      localStorage.setItem('guest-quiz-history', JSON.stringify(updated));
     }
   };
 
@@ -319,7 +280,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const currentStatus = !!revisionProgress[sessionId];
     const updated = { ...revisionProgress, [sessionId]: !currentStatus };
     setRevisionProgress(updated);
-    localStorage.setItem('revision-plan-progress', JSON.stringify(updated));
 
     if (user) {
       try {
@@ -336,6 +296,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } catch (err) {
         console.error('Failed to save revision progress to DB:', err);
       }
+    } else {
+      // Guest mode: Save only to guest local storage
+      localStorage.setItem('guest-revision-progress', JSON.stringify(updated));
     }
   };
 
@@ -372,4 +335,5 @@ export const useUser = () => {
   }
   return context;
 };
+
 
