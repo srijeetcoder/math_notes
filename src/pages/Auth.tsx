@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../services/supabase';
-import { Mail, Lock, User, Eye, EyeOff, Loader2, AlertCircle, CheckCircle, ArrowLeft, GraduationCap } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, Loader2, AlertCircle, CheckCircle, ArrowLeft } from 'lucide-react';
 
 export const Auth: React.FC = () => {
   const navigate = useNavigate();
@@ -128,8 +128,8 @@ export const Auth: React.FC = () => {
           
           {/* Brand Logo Header */}
           <div className="flex flex-col items-center mb-8">
-            <div className="w-12 h-12 bg-indigo-600 dark:bg-violet-600 rounded-2xl flex items-center justify-center text-white shadow-lg mb-3 shadow-indigo-600/20 dark:shadow-violet-600/30">
-              <GraduationCap size={26} />
+            <div className="w-12 h-12 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl flex items-center justify-center shadow-lg mb-3 shadow-indigo-600/5">
+              <img src="/favicon.png" alt="Logo" className="w-8 h-8 object-contain" />
             </div>
             <h2 className="text-2xl font-extrabold text-zinc-900 dark:text-white tracking-tight">
               {isSignUp ? 'Create your account' : 'Welcome back'}

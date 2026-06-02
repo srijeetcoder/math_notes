@@ -5,7 +5,6 @@ import {
   BookOpen, 
   Calculator, 
   BrainCircuit, 
-  GraduationCap, 
   FileText,
   ChevronDown,
   ChevronRight
@@ -57,7 +56,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed
       >
         {/* Pinned Top Header */}
         <div className="p-4 flex items-center gap-2 border-b border-zinc-200 dark:border-zinc-900 shrink-0">
-          <GraduationCap className="text-indigo-600 dark:text-violet-400 shrink-0" size={28} />
+          <img src="/favicon.png" alt="Logo" className="w-7 h-7 object-contain shrink-0" />
           {!isCollapsed && (
             <h1 className="font-bold text-lg text-zinc-900 dark:text-white leading-tight animate-in fade-in duration-200">
               Second Sem<br/>Math
