@@ -82,7 +82,7 @@ export const LandingPage: React.FC = () => {
         {/* Animated "Sign Up to Study" Button */}
         <div className="flex justify-center mb-16">
           <button
-            onClick={() => navigate('/auth')}
+            onClick={() => navigate('/auth', { state: { isSignUp: true } })}
             className="group relative inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-indigo-600 hover:bg-indigo-700 dark:bg-white dark:text-black dark:hover:bg-zinc-200 text-white font-bold rounded-2xl shadow-lg hover:shadow-indigo-500/20 dark:hover:shadow-white/20 transition-all duration-300 hover:scale-105 active:scale-98 cursor-pointer overflow-hidden animate-pulse-slow"
           >
             {/* Glowing Hover Layer */}
@@ -235,7 +235,7 @@ export const LandingPage: React.FC = () => {
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <button
-              onClick={() => navigate('/auth')}
+              onClick={() => navigate('/auth', { state: { isSignUp: true } })}
               className="px-8 py-3.5 bg-white text-indigo-600 hover:bg-zinc-100 font-bold rounded-2xl shadow-md transition-all active:scale-98 cursor-pointer flex items-center gap-2"
             >
               Get Started Free
