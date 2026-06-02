@@ -39,10 +39,11 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   }, []);
 
   const getInitials = () => {
-    if (profile?.full_name) {
-      return profile.full_name
+    const name = (profile?.full_name || user?.user_metadata?.full_name) as string | undefined;
+    if (name) {
+      return name
         .split(' ')
-        .map(n => n[0])
+        .map((n: string) => n[0])
         .join('')
         .toUpperCase()
         .slice(0, 2);
@@ -91,7 +92,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     {getInitials()}
                   </div>
                   <span className="hidden sm:inline max-w-[100px] truncate text-zinc-700 dark:text-zinc-300">
-                    {profile?.full_name || user.email?.split('@')[0]}
+                    {profile?.full_name || user.user_metadata?.full_name || user.email?.split('@')[0]}
                   </span>
                   <ChevronDown size={14} className="text-zinc-500 shrink-0" />
                 </button>
@@ -102,7 +103,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     <div className="px-4 py-2.5 border-b border-zinc-100 dark:border-zinc-800/80 mb-2">
                       <p className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Signed in as</p>
                       <p className="font-bold text-zinc-900 dark:text-white truncate mt-0.5 text-sm">
-                        {profile?.full_name || 'Student'}
+                        {profile?.full_name || user.user_metadata?.full_name || 'Student'}
                       </p>
                       <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
                         {user.email}
