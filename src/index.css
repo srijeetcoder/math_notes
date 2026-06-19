@@ -1,25 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap');
+
 @import "tailwindcss";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme {
   --font-sans: "Inter", system-ui, sans-serif;
-  --font-serif: "Merriweather", serif;
+  --font-mono: "JetBrains Mono", monospace;
   
-  --color-primary-50: #0f0b18;
-  --color-primary-100: #20133a;
-  --color-primary-500: #8b5cf6;
-  --color-primary-600: #7c3aed;
-  --color-primary-700: #6d28d9;
+  --color-zinc-50: #f8fafc;
+  --color-zinc-100: #f1f5f9;
+  --color-zinc-150: #e2e8f0;
+  --color-zinc-200: #e2e8f0;
+  --color-zinc-300: #cbd5e1;
+  --color-zinc-400: #94a3b8;
+  --color-zinc-500: #64748b;
+  --color-zinc-650: #475569;
+  --color-zinc-700: #334155;
+  --color-zinc-800: #1e293b;
+  --color-zinc-900: #0f1b2e;
+  --color-zinc-950: #07111f;
   
-  --color-dark-bg: #000000;
-  --color-dark-card: #09090b;
-  --color-dark-border: #1c1c1e;
+  --color-black: #07111f;
+  --color-white: #ffffff;
+  
+  --color-indigo-50: #f5f3ff;
+  --color-indigo-100: #e0e7ff;
+  --color-indigo-500: #6366f1;
+  --color-indigo-600: #4f46e5;
+  --color-indigo-700: #4338ca;
+
+  --color-violet-500: #6366f1;
+  --color-violet-600: #4f46e5;
+  --color-violet-400: #6366f1;
+  
+  --color-dark-bg: #07111f;
+  --color-dark-card: #0f1b2e;
+  --color-dark-border: #1e293b;
+  
+  --color-cyan-500: #22d3ee;
+  --color-cyan-600: #0891b2;
+  --color-cyan-400: #22d3ee;
+  
+  --color-amber-500: #f59e0b;
 }
 
 @layer base {
   body {
-    @apply antialiased text-zinc-900 bg-zinc-50 transition-colors duration-200;
+    @apply antialiased text-zinc-900 bg-zinc-50 transition-colors duration-200 font-sans;
   }
   
   .dark body {
@@ -29,11 +57,24 @@
 
 @layer utilities {
   .math-display {
-    @apply block overflow-x-auto py-2 my-4 text-lg max-w-full;
+    @apply block overflow-x-auto py-2 my-4 text-lg max-w-full font-mono;
   }
   
   .math-inline {
-    @apply mx-1 text-base;
+    @apply mx-1 text-base font-mono;
+  }
+
+  .math-grid {
+    background-size: 40px 40px;
+    background-image: 
+      linear-gradient(to right, rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+  }
+  
+  .dark .math-grid {
+    background-image: 
+      linear-gradient(to right, rgba(34, 211, 238, 0.02) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(34, 211, 238, 0.02) 1px, transparent 1px);
   }
 }
 
@@ -51,7 +92,10 @@
   text-align: left !important;
 }
 
-/* KaTeX custom overrides for dark mode readability if needed */
+/* KaTeX custom overrides for dark mode readability */
 .dark .katex {
-  color: #e2e8f0;
+  color: #f8fafc;
+}
+.katex {
+  font-family: var(--font-mono) !important;
 }

@@ -4,6 +4,8 @@ import { syllabus, courseDetails } from '../data/syllabus';
 import { BrainCircuit, PlayCircle, CheckCircle2, Calendar, Award, BookOpen, GraduationCap } from 'lucide-react';
 import { useUser } from '../context/UserContext';
 import type { UnitStatus } from '../context/UserContext';
+import { TopicCard } from '../components/ContentCards';
+import { topics } from '../data/topics';
 
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -218,25 +220,41 @@ export const Dashboard: React.FC = () => {
                   </div>
 
                   {/* Topics List */}
-                  <div className="space-y-2 mt-4">
-                    <span className="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Topics covered:</span>
-                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 pt-1">
-                      {unit.topics.map((topic, i) => (
-                        <li key={i} className="text-sm flex items-start gap-2 text-zinc-700 dark:text-zinc-300">
-                          <span className="text-zinc-400 dark:text-zinc-650 mt-1.5 shrink-0">•</span>
-                          {topic.topicId ? (
-                            <Link 
-                              to={`/topic/${topic.topicId}`}
-                              className="text-indigo-600 dark:text-violet-400 hover:text-indigo-700 dark:hover:text-violet-300 hover:underline transition-colors text-left"
-                            >
-                              {topic.name}
-                            </Link>
-                          ) : (
-                            <span className="text-zinc-600 dark:text-zinc-450 text-left">{topic.name}</span>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
+                  <div className="space-y-3 mt-4">
+                    <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">Subtopic Notes & Study Materials</span>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+                      {unit.topics.map((topicItem, i) => {
+                        const fullTopic = topics.find(t => t.id === topicItem.topicId);
+                        
+                        if (topicItem.topicId && fullTopic) {
+                          // Find completion status of this topic
+                          const isRevised = localStorage.getItem(`topic-revised-${fullTopic.id}`) === 'true';
+                          const status = isRevised ? 'Completed' : 'Pending';
+                          
+                          return (
+                            <TopicCard 
+                              key={i}
+                              title={fullTopic.title}
+                              unitNumber={unit.number}
+                              description={fullTopic.conceptExplanation.substring(0, 110) + '...'}
+                              priority={fullTopic.priority}
+                              status={status}
+                              estimatedTime={fullTopic.priority === 'High' ? '60 min' : fullTopic.priority === 'Medium' ? '45 min' : '30 min'}
+                              onOpenNotes={() => navigate(`/topic/${fullTopic.id}`)}
+                            />
+                          );
+                        } else {
+                          // Inactive coming soon topic
+                          return (
+                            <div key={i} className="bg-zinc-50 dark:bg-[#07111f]/60 p-5 rounded-2xl border border-dashed border-zinc-200 dark:border-[#1e293b] flex flex-col justify-center min-h-[140px] select-none text-center shadow-sm">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Unit {unit.number} Subtopic</span>
+                              <span className="text-sm font-extrabold text-zinc-650 dark:text-[#94a3b8] mt-1">{topicItem.name}</span>
+                              <span className="text-[9px] text-[#4f46e5] dark:text-[#22d3ee] mt-1 uppercase tracking-wider font-extrabold">Coming Soon</span>
+                            </div>
+                          );
+                        }
+                      })}
+                    </div>
                   </div>
                 </div>
 
