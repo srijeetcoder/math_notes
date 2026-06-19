@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { topics } from '../data/topics';
 import { formulas } from '../data/formulas';
@@ -8,7 +8,7 @@ import { BinomialCalculator } from '../components/BinomialCalculator';
 import { PMFCalculator, CDFBuilder } from '../components/Calculators';
 import { CheckCircle } from 'lucide-react';
 
-export const TopicPage: React.FC = () => {
+const TopicPageContent: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const topic = topics.find(t => t.id === id);
   const topicFormulas = formulas.filter(f => f.topicId === id);
@@ -17,6 +17,10 @@ export const TopicPage: React.FC = () => {
     if (!id) return false;
     return localStorage.getItem(`topic-revised-${id}`) === 'true';
   });
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   if (!topic) {
     return <Navigate to="/" replace />;
@@ -143,4 +147,9 @@ export const TopicPage: React.FC = () => {
       </div>
     </div>
   );
+};
+
+export const TopicPage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  return <TopicPageContent key={id} />;
 };
