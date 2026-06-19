@@ -22,6 +22,7 @@ interface UserContextType {
   toggleRevisionSession: (sessionId: string) => Promise<void>;
   logout: () => Promise<void>;
   deleteAccount: () => Promise<void>;
+  loginAsGuest: () => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -69,6 +70,18 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (session?.user) {
           setUser(session.user);
           await loadUserData(session.user.id, session.user);
+        } else if (import.meta.env.DEV && localStorage.getItem('dev-bypass-login') === 'true') {
+          const mockUser = {
+            id: 'local-dev-user-id',
+            email: 'developer@example.com',
+            user_metadata: { full_name: 'Developer Guest' }
+          } as any;
+          setUser(mockUser);
+          setProfile({ full_name: 'Developer Guest' });
+          setSyllabusProgress(getGuestSyllabusProgress());
+          setQuizHistory(getGuestQuizHistory());
+          setRevisionProgress(getGuestRevisionProgress());
+          setLoading(false);
         } else {
           // Initialize states with Guest progress
           setSyllabusProgress(getGuestSyllabusProgress());
@@ -328,6 +341,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     setLoading(true);
+    if (import.meta.env.DEV) {
+      localStorage.removeItem('dev-bypass-login');
+    }
     await supabase.auth.signOut();
   };
 
@@ -346,6 +362,23 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const loginAsGuest = () => {
+    localStorage.setItem('dev-bypass-login', 'true');
+    const mockUser = {
+      id: 'local-dev-user-id',
+      email: 'developer@example.com',
+      user_metadata: {
+        full_name: 'Developer Guest'
+      }
+    } as any;
+    setUser(mockUser);
+    setProfile({ full_name: 'Developer Guest' });
+    setSyllabusProgress(getGuestSyllabusProgress());
+    setQuizHistory(getGuestQuizHistory());
+    setRevisionProgress(getGuestRevisionProgress());
+    setLoading(false);
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -360,7 +393,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         deleteQuiz,
         toggleRevisionSession,
         logout,
-        deleteAccount
+        deleteAccount,
+        loginAsGuest
       }}
     >
       {children}

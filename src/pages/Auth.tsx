@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../services/supabase';
 import { Mail, Lock, User, Eye, EyeOff, Loader2, AlertCircle, CheckCircle, ArrowLeft } from 'lucide-react';
+import { useUser } from '../context/UserContext';
 
 export const Auth: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { loginAsGuest } = useUser();
   
   const [isSignUp, setIsSignUp] = useState(() => {
     return !!(location.state as any)?.isSignUp;
@@ -261,6 +263,19 @@ export const Auth: React.FC = () => {
                 isSignUp ? 'Create Account' : 'Sign In'
               )}
             </button>
+            {import.meta.env.DEV && (
+              <button
+                type="button"
+                onClick={() => {
+                  loginAsGuest();
+                  setSuccessMsg('Bypassing authentication...');
+                  setTimeout(() => navigate(from, { replace: true }), 1000);
+                }}
+                className="w-full py-3.5 bg-zinc-100 hover:bg-zinc-250 dark:bg-zinc-800 dark:hover:bg-zinc-750 text-zinc-700 dark:text-zinc-300 rounded-2xl font-semibold shadow-sm border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-all active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer mt-3 text-sm"
+              >
+                Bypass Sign In (Local Dev)
+              </button>
+            )}
           </form>
 
           {/* Toggle Footer */}

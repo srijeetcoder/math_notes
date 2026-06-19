@@ -91,12 +91,27 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     if (path.startsWith('/topic/')) {
       const topicId = path.split('/topic/')[1];
       const topic = topics.find(t => t.id === topicId);
-      const unit = syllabus.find(u => u.topics.some(t => t.topicId === topicId));
+      
+      const searchParams = new URLSearchParams(location.search);
+      const subtopicName = searchParams.get('subtopic');
+      const unitNum = searchParams.get('unit');
+      
+      let unit = null;
+      if (unitNum) {
+        unit = syllabus.find(u => u.number === parseInt(unitNum));
+      }
+      if (!unit && subtopicName) {
+        unit = syllabus.find(u => u.topics.some(t => t.name === subtopicName && t.topicId === topicId));
+      }
+      if (!unit) {
+        unit = syllabus.find(u => u.topics.some(t => t.topicId === topicId));
+      }
+
       if (topic && unit) {
         return [
           { name: 'Dashboard', path: '/dashboard' },
           { name: `Unit ${unit.number}`, path: '/dashboard' },
-          { name: topic.title, path: `/topic/${topicId}` }
+          { name: subtopicName || topic.title, path: `/topic/${topicId}${location.search}` }
         ];
       }
     }

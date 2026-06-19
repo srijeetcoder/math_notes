@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   BookOpen, 
@@ -20,6 +20,7 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed = false }) => {
   const { syllabusProgress } = useUser();
+  const location = useLocation();
   const [expandedUnits, setExpandedUnits] = useState<Record<string, boolean>>(() => {
     // Expand Unit 1 by default for a friendly open feel
     return { 'unit-1-basic-probability': true };
@@ -129,14 +130,21 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed
                       <div className="pl-3 border-l border-zinc-200 dark:border-[#1e293b] ml-4 py-1 space-y-1 animate-in slide-in-from-top-1 duration-200">
                         {unit.topics.map((topic, i) => {
                           if (topic.topicId) {
+                            const searchParams = new URLSearchParams(location.search);
+                            const currentSubtopic = searchParams.get('subtopic');
+                            const currentUnit = searchParams.get('unit');
+                            const isTopicActive = location.pathname === `/topic/${topic.topicId}` && 
+                              (!currentSubtopic || currentSubtopic === topic.name) && 
+                              (!currentUnit || parseInt(currentUnit) === unit.number);
+
                             return (
                               <NavLink
                                 key={i}
-                                to={`/topic/${topic.topicId}`}
+                                to={`/topic/${topic.topicId}?subtopic=${encodeURIComponent(topic.name)}&unit=${unit.number}`}
                                 onClick={() => setIsOpen(false)}
-                                className={({ isActive }) => 
+                                className={() => 
                                   `block px-3 py-1.5 rounded-lg text-xs transition-all ${
-                                    isActive 
+                                    isTopicActive 
                                       ? 'bg-zinc-100 text-[#4f46e5] dark:bg-[#0f1b2e] dark:text-[#22d3ee] font-semibold border-l-2 border-indigo-500 dark:border-cyan-400' 
                                       : 'text-[#475569] hover:bg-zinc-50 dark:text-[#94a3b8] dark:hover:bg-[#0f1b2e]/40 hover:text-[#0f172a] dark:hover:text-[#f8fafc]'
                                   }`

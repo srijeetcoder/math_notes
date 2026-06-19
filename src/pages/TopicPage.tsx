@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Navigate } from 'react-router-dom';
+import { useParams, Navigate, useLocation } from 'react-router-dom';
 import { topics } from '../data/topics';
 import { formulas } from '../data/formulas';
 import { MathRenderer, TextWithMath } from '../components/MathRenderer';
@@ -165,6 +165,9 @@ const TheoremBox: React.FC<{ title: string; statement: string; proof: string; ex
 
 const TopicPageContent: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const subtopicName = searchParams.get('subtopic');
   const topic = topics.find(t => t.id === id);
   const topicFormulas = formulas.filter(f => f.topicId === id);
   
@@ -249,8 +252,15 @@ const TopicPageContent: React.FC = () => {
             </span>
           </div>
           <div>
-            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-[#0f172a] dark:text-[#f8fafc]">{topic.title}</h1>
-            <div className="text-sm md:text-base text-[#475569] dark:text-[#94a3b8] mt-3 leading-relaxed">
+            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-[#0f172a] dark:text-[#f8fafc]">
+              {subtopicName || topic.title}
+            </h1>
+            {subtopicName && subtopicName !== topic.title && (
+              <p className="text-xs font-bold text-[#4f46e5] dark:text-[#22d3ee] uppercase tracking-wider mt-1.5 flex items-center gap-1">
+                <span className="opacity-60">Part of:</span> <span className="font-extrabold">{topic.title}</span>
+              </p>
+            )}
+            <div className="text-sm md:text-base text-[#475569] dark:text-[#94a3b8] mt-4 leading-relaxed">
               <TextWithMath text={topic.conceptExplanation} />
             </div>
           </div>

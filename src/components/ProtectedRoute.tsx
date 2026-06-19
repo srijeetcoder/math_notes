@@ -22,7 +22,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (!user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={import.meta.env.DEV ? "/auth" : "/"} replace />;
   }
 
   return <>{children}</>;

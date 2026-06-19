@@ -53,7 +53,7 @@ export const syllabus: SyllabusUnit[] = [
     topics: [
       { name: 'Probability spaces', topicId: 'basic-probability' },
       { name: 'Conditional probability', topicId: 'conditional-probability' },
-      { name: 'Independence', topicId: 'basic-probability' },
+      { name: 'Independence', topicId: 'conditional-probability' },
       { name: 'Discrete random variables', topicId: 'pmf-pdf-cdf' },
       { name: 'Independent random variables', topicId: 'bivariate-distributions' },
       { name: 'Multinomial distribution', topicId: 'binomial' },
