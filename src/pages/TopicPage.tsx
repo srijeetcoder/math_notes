@@ -6,7 +6,7 @@ import { MathRenderer, TextWithMath } from '../components/MathRenderer';
 import { SolvedExample } from '../components/InteractiveLearning';
 import { BinomialCalculator } from '../components/BinomialCalculator';
 import { PMFCalculator, CDFBuilder } from '../components/Calculators';
-import { CheckCircle, Circle, Eye, EyeOff, Info, Award, HelpCircle, BookOpen, AlertTriangle } from 'lucide-react';
+import { CheckCircle, Circle, Eye, EyeOff, Info, Award, HelpCircle, BookOpen, AlertTriangle, Download } from 'lucide-react';
 import { CopyButton } from '../components/ContentCards';
 
 // Theorems Database
@@ -163,11 +163,148 @@ const TheoremBox: React.FC<{ title: string; statement: string; proof: string; ex
   );
 };
 
+const PrintableNotesView: React.FC<{
+  topic: any;
+  topicFormulas: any[];
+  theorems: any[] | undefined;
+}> = ({ topic, topicFormulas, theorems }) => {
+  let sectionIndex = 1;
+
+  return (
+    <div className="print-only font-serif text-black bg-white">
+      {/* Page 1 Running Header Cover */}
+      <div className="print-first-page-cover" />
+      
+      {/* Running Header */}
+      <div className="print-header">
+        <span>Erudito</span>
+        <span>BS-M201</span>
+      </div>
+
+      {/* Title block */}
+      <div className="flex gap-4 border-l-[4px] border-[#0056b3] pl-5 py-1 mb-8">
+        <div>
+          <h1 className="text-[26pt] font-sans font-extrabold tracking-tight text-black leading-[1.1] m-0">
+            {topic.title}
+          </h1>
+          <div className="text-[10pt] font-sans font-semibold text-zinc-600 mt-2 tracking-wide uppercase">
+            BS-M201
+          </div>
+        </div>
+      </div>
+
+      {/* Section 1: Concept Explanation */}
+      <div className="print-section">
+        <h2 className="print-section-title font-sans">
+          {sectionIndex++} Concept Explanation
+        </h2>
+        <div className="print-section-rule" />
+        <div className="font-serif text-[11pt] text-black leading-[1.55]">
+          <TextWithMath text={topic.conceptExplanation} />
+        </div>
+      </div>
+
+      {/* Section 2: Core Theorems & Laws */}
+      {theorems && theorems.length > 0 && (
+        <div className="print-section">
+          <h2 className="print-section-title font-sans">
+            {sectionIndex++} Core Theorems & Laws
+          </h2>
+          <div className="print-section-rule" />
+          {theorems.map((theorem, idx) => (
+            <div key={idx} className="print-prevent-split mt-4">
+              <h3 className="print-subsection-title font-sans">
+                {(sectionIndex - 1)}.{idx + 1} {theorem.title}
+              </h3>
+              <div className="font-serif text-[11pt] text-black leading-[1.5] mb-3">
+                <TextWithMath text={theorem.statement} />
+              </div>
+              {theorem.proof && (
+                <div className="print-proof font-serif text-[10.5pt] leading-[1.45] text-black mb-3">
+                  <span className="print-proof-label">Proof. </span>
+                  <TextWithMath text={theorem.proof} />
+                  <span className="print-qed">■</span>
+                  <div className="clear-both" />
+                </div>
+              )}
+              {theorem.example && (
+                <div className="print-example-box font-serif text-[10.5pt] leading-[1.45] text-black mb-3">
+                  <span className="font-bold italic">Example. </span>
+                  <TextWithMath text={theorem.example} />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Section 3: Step-by-Step Method */}
+      {topic.stepByStepMethod && topic.stepByStepMethod.length > 0 && (
+        <div className="print-section print-prevent-split">
+          <h2 className="print-section-title font-sans">
+            {sectionIndex++} Step-by-Step Method
+          </h2>
+          <div className="print-section-rule" />
+          <ol className="list-decimal pl-[20pt] space-y-2">
+            {topic.stepByStepMethod.map((step: string, idx: number) => (
+              <li key={idx} className="font-serif text-[11pt] text-black leading-[1.5]">
+                <TextWithMath text={step} />
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+
+      {/* Section 4: Key Formulas Cheat Sheet */}
+      {topicFormulas && topicFormulas.length > 0 && (
+        <div className="print-section print-prevent-split">
+          <h2 className="print-section-title font-sans">
+            {sectionIndex++} Key Formulas Cheat Sheet
+          </h2>
+          <div className="print-section-rule" />
+          <div className="space-y-4">
+            {topicFormulas.map((f, idx) => (
+              <div key={idx} className="font-serif text-[11pt] text-black leading-[1.5] flex items-center justify-between gap-2 border-b border-zinc-100 pb-2">
+                <span className="font-semibold text-zinc-800">{f.title}:</span>
+                <MathRenderer math={f.expression} inline={true} className="font-mono text-black" />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+
+      {/* Section 6: Common Pitfalls & Mistakes */}
+      {topic.commonMistakes && topic.commonMistakes.length > 0 && (
+        <div className="print-section print-prevent-split">
+          <h2 className="print-section-title font-sans">
+            {sectionIndex++} Common Pitfalls & Mistakes
+          </h2>
+          <div className="print-section-rule" />
+          <ul className="list-disc pl-[20pt] space-y-2">
+            {topic.commonMistakes.map((mistake: string, idx: number) => (
+              <li key={idx} className="font-serif text-[11pt] text-black leading-[1.5]">
+                <TextWithMath text={mistake} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Running Footer at end of document */}
+      <div className="print-last-page-footer font-sans">
+        BS-M201
+      </div>
+    </div>
+  );
+};
+
 const TopicPageContent: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const subtopicName = searchParams.get('subtopic');
+  const subtopicNameRaw = searchParams.get('subtopic');
+  const subtopicName = subtopicNameRaw ? decodeURIComponent(subtopicNameRaw) : null;
   const topic = topics.find(t => t.id === id);
   const topicFormulas = formulas.filter(f => f.topicId === id);
   
@@ -226,262 +363,288 @@ const TopicPageContent: React.FC = () => {
     };
   };
 
-  const activeQuestion = getPracticeQuestion();
-
-  return (
-    <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500">
-      
-      {/* Top conceptual introduction header */}
-      <div className="bg-white dark:bg-[#0f1b2e] border border-zinc-200 dark:border-[#1e293b] rounded-2xl p-6 shadow-sm flex flex-col md:flex-row md:items-start justify-between gap-6 relative overflow-hidden">
-        {/* Decorative ambient glow */}
-        <div className="absolute top-0 right-0 w-60 h-60 bg-indigo-500/5 dark:bg-[#22d3ee]/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
+  const activeQuestion = getPracticeQuestion();  return (
+    <>
+      {/* Screen-only view of the topic page */}
+      <div className="no-print max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
         
-        <div className="relative z-10 flex-1 space-y-4">
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="text-[10px] font-bold uppercase tracking-wider bg-zinc-100 dark:bg-zinc-800 text-[#475569] dark:text-[#94a3b8] border border-zinc-200 dark:border-zinc-700 px-2.5 py-1 rounded-full shadow-sm">
-              Study Lecture
-            </span>
-            <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border ${
-              topic.priority === 'High' 
-                ? 'bg-red-500/10 text-red-650 dark:text-red-400 border-red-500/10' 
-                : topic.priority === 'Medium' 
-                  ? 'bg-amber-500/10 text-amber-600 dark:text-[#f59e0b] border-amber-500/10' 
-                  : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-450 border-emerald-500/10'
-            }`}>
-              {topic.priority} Priority
-            </span>
-          </div>
-          <div>
-            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-[#0f172a] dark:text-[#f8fafc]">
-              {subtopicName || topic.title}
-            </h1>
-            {subtopicName && subtopicName !== topic.title && (
-              <p className="text-xs font-bold text-[#4f46e5] dark:text-[#22d3ee] uppercase tracking-wider mt-1.5 flex items-center gap-1">
-                <span className="opacity-60">Part of:</span> <span className="font-extrabold">{topic.title}</span>
-              </p>
-            )}
-            <div className="text-sm md:text-base text-[#475569] dark:text-[#94a3b8] mt-4 leading-relaxed">
-              <TextWithMath text={topic.conceptExplanation} />
-            </div>
-          </div>
-        </div>
-        
-        <button 
-          onClick={toggleRevised}
-          className={`shrink-0 z-10 px-5 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 text-xs shadow-sm cursor-pointer border ${
-            isRevised 
-              ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' 
-              : 'bg-zinc-900 text-white dark:bg-white dark:text-[#07111f] border-zinc-900 dark:border-white hover:opacity-90'
-          }`}
-        >
-          <CheckCircle size={16} />
-          {isRevised ? 'Marked as Revised' : 'Mark as Revised'}
-        </button>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-        {/* Main Content Area */}
-        <div className="lg:col-span-2 space-y-8">
+        {/* Top conceptual introduction header */}
+        <div className="bg-white dark:bg-[#0f1b2e] border border-zinc-200 dark:border-[#1e293b] rounded-2xl p-6 shadow-sm flex flex-col md:flex-row md:items-start justify-between gap-6 relative overflow-hidden">
+          {/* Decorative ambient glow */}
+          <div className="absolute top-0 right-0 w-60 h-60 bg-indigo-500/5 dark:bg-[#22d3ee]/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
           
-          {/* Theorems Section */}
-          {topicTheorems[topic.id] && (
-            <section className="space-y-4">
-              <h2 className="text-xl font-black text-[#0f172a] dark:text-[#f8fafc] tracking-wide uppercase flex items-center gap-2">
-                Core Theorems & Laws
-              </h2>
-              {topicTheorems[topic.id].map((theorem, idx) => (
-                <TheoremBox 
-                  key={idx}
-                  title={theorem.title}
-                  statement={theorem.statement}
-                  proof={theorem.proof}
-                  example={theorem.example}
-                />
-              ))}
-            </section>
-          )}
-
-          {/* Step by Step Guide */}
-          <section className="bg-white dark:bg-[#0f1b2e] rounded-2xl p-6 border border-zinc-200 dark:border-[#1e293b] shadow-sm">
-            <h2 className="text-lg font-black mb-4 text-[#0f172a] dark:text-[#f8fafc] border-b border-zinc-100 dark:border-[#1e293b]/50 pb-2 flex items-center gap-1.5 uppercase tracking-wide">
-              Step-by-Step Method
-            </h2>
-            <ol className="list-decimal list-inside space-y-3.5 text-[#475569] dark:text-[#94a3b8] text-sm">
-              {topic.stepByStepMethod.map((step, i) => (
-                <li key={i} className="pl-1 leading-relaxed"><TextWithMath text={step} /></li>
-              ))}
-            </ol>
-          </section>
-
-          {/* Solved Examples */}
-          <section className="space-y-4">
-            <h2 className="text-xl font-black text-[#0f172a] dark:text-[#f8fafc] uppercase tracking-wide flex items-center gap-2">
-              Solved Examples
-            </h2>
-            {topic.solvedExamples.map((ex, i) => (
-              <SolvedExample key={i} title={ex.title} problem={ex.problem} solution={ex.solution} />
-            ))}
-          </section>
-
-          {/* Upgraded Practice Section */}
-          <section className="bg-white dark:bg-[#0f1b2e] rounded-2xl border border-zinc-200 dark:border-[#1e293b] overflow-hidden shadow-sm">
-            <div className="bg-zinc-50 dark:bg-[#0f1b2e]/60 px-6 py-4 border-b border-zinc-200 dark:border-[#1e293b] flex flex-wrap justify-between items-center gap-4">
-              <h2 className="text-base font-black text-[#0f172a] dark:text-[#f8fafc] uppercase tracking-wide flex items-center gap-2">
-                <HelpCircle size={18} className="text-indigo-600 dark:text-[#22d3ee]" /> Practice Sandbox
-              </h2>
-              {/* Difficulty Tabs */}
-              <div className="flex bg-zinc-100 dark:bg-zinc-950 p-1 rounded-xl border border-zinc-200 dark:border-zinc-800">
-                {(['easy', 'medium', 'hard'] as const).map((diff) => (
-                  <button
-                    key={diff}
-                    onClick={() => setPracticeDiff(diff)}
-                    className={`px-3 py-1 text-xs font-bold rounded-lg uppercase tracking-wider transition-all cursor-pointer ${
-                      practiceDiff === diff
-                        ? 'bg-white dark:bg-[#0f1b2e] text-[#0f172a] dark:text-[#22d3ee] shadow-sm border border-zinc-200/50 dark:border-[#1e293b]/50'
-                        : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-[#f8fafc]'
-                    }`}
-                  >
-                    {diff}
-                  </button>
-                ))}
+          <div className="relative z-10 flex-1 space-y-4">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-[10px] font-bold uppercase tracking-wider bg-zinc-100 dark:bg-zinc-800 text-[#475569] dark:text-[#94a3b8] border border-zinc-200 dark:border-zinc-700 px-2.5 py-1 rounded-full shadow-sm">
+                Study Lecture
+              </span>
+              <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border ${
+                topic.priority === 'High' 
+                  ? 'bg-red-500/10 text-red-650 dark:text-red-400 border-red-500/10' 
+                  : topic.priority === 'Medium' 
+                    ? 'bg-amber-500/10 text-amber-600 dark:text-[#f59e0b] border-amber-500/10' 
+                    : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-450 border-emerald-500/10'
+              }`}>
+                {topic.priority} Priority
+              </span>
+            </div>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-[#0f172a] dark:text-[#f8fafc]">
+                {subtopicName || topic.title}
+              </h1>
+              {subtopicName && subtopicName !== topic.title && (
+                <p className="text-xs font-bold text-[#4f46e5] dark:text-[#22d3ee] uppercase tracking-wider mt-1.5 flex items-center gap-1">
+                  <span className="opacity-60">Part of:</span> <span className="font-extrabold">{topic.title}</span>
+                </p>
+              )}
+              <div className="text-sm md:text-base text-[#475569] dark:text-[#94a3b8] mt-4 leading-relaxed">
+                <TextWithMath text={topic.conceptExplanation} />
+              </div>
+              
+              {/* Download PDF print options helper tip */}
+              <div className="mt-4 p-3.5 bg-indigo-50/20 dark:bg-zinc-900/30 border border-indigo-100/10 dark:border-zinc-800/40 rounded-xl flex items-start gap-2.5 text-xs text-[#475569] dark:text-[#94a3b8] leading-relaxed">
+                <Info size={14} className="text-indigo-600 dark:text-[#22d3ee] shrink-0 mt-0.5" />
+                <span>
+                  <strong className="text-[#0f172a] dark:text-[#f8fafc]">Pro-tip:</strong> When downloading the PDF notes, set the destination to <strong className="text-indigo-650 dark:text-[#22d3ee]">"Save as PDF"</strong> and uncheck <strong className="text-indigo-650 dark:text-[#22d3ee]">"Headers and footers"</strong> in print settings to experience the clean, authentic LaTeX layout.
+                </span>
               </div>
             </div>
+          </div>
+          
+          <div className="flex flex-wrap gap-2.5 shrink-0 z-10">
+            <button 
+              onClick={() => window.print()}
+              className="px-5 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 text-xs shadow-sm cursor-pointer border bg-indigo-600 hover:bg-indigo-700 text-white dark:bg-white dark:hover:bg-zinc-200 dark:text-black border-indigo-600 dark:border-white"
+            >
+              <Download size={16} />
+              Download PDF Notes
+            </button>
+
+            <button 
+              onClick={toggleRevised}
+              className={`px-5 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-95 text-xs shadow-sm cursor-pointer border ${
+                isRevised 
+                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' 
+                  : 'bg-zinc-900 text-white dark:bg-white dark:text-[#07111f] border-zinc-900 dark:border-white hover:opacity-90'
+              }`}
+            >
+              <CheckCircle size={16} />
+              {isRevised ? 'Marked as Revised' : 'Mark as Revised'}
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+          {/* Main Content Area */}
+          <div className="lg:col-span-2 space-y-8">
             
-            <div className="p-6 space-y-6">
-              <div className="flex gap-4 items-start">
-                {/* Completion Check Circle */}
-                <button 
-                  onClick={togglePracCompleted}
-                  className={`mt-1 flex-shrink-0 transition-colors cursor-pointer ${
-                    isCompletedState 
-                      ? 'text-emerald-500' 
-                      : 'text-zinc-300 hover:text-zinc-400 dark:text-zinc-700 dark:hover:text-zinc-650'
-                  }`}
-                  title={isCompletedState ? 'Mark as incomplete' : 'Mark as complete'}
-                >
-                  {isCompletedState ? <CheckCircle size={24} /> : <Circle size={24} />}
-                </button>
-                
-                <div className="flex-1 min-w-0 space-y-4">
-                  <div className="text-sm font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest flex items-center gap-1.5">
-                    Difficulty level: 
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full border ${
-                      practiceDiff === 'hard' 
-                        ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/10' 
-                        : practiceDiff === 'medium'
-                          ? 'bg-amber-500/10 text-amber-600 dark:text-[#f59e0b] border-amber-500/10'
-                          : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/10'
-                    }`}>
-                      {practiceDiff}
-                    </span>
-                  </div>
-                  <div className="text-sm text-[#0f172a] dark:text-[#f8fafc] leading-relaxed font-semibold">
-                    <TextWithMath text={activeQuestion.text} />
-                  </div>
-                  
-                  <div className="pt-2">
-                    <button 
-                      onClick={() => setShowSolution(!showSolution)}
-                      className="inline-flex items-center gap-1 text-xs font-bold text-[#4f46e5] dark:text-[#22d3ee] hover:underline cursor-pointer"
+            {/* Theorems Section */}
+            {topicTheorems[topic.id] && (
+              <section className="space-y-4">
+                <h2 className="text-xl font-black text-[#0f172a] dark:text-[#f8fafc] tracking-wide uppercase flex items-center gap-2">
+                  Core Theorems & Laws
+                </h2>
+                {topicTheorems[topic.id].map((theorem, idx) => (
+                  <TheoremBox 
+                    key={idx}
+                    title={theorem.title}
+                    statement={theorem.statement}
+                    proof={theorem.proof}
+                    example={theorem.example}
+                  />
+                ))}
+              </section>
+            )}
+
+            {/* Step by Step Guide */}
+            <section className="bg-white dark:bg-[#0f1b2e] rounded-2xl p-6 border border-zinc-200 dark:border-[#1e293b] shadow-sm">
+              <h2 className="text-lg font-black mb-4 text-[#0f172a] dark:text-[#f8fafc] border-b border-zinc-100 dark:border-[#1e293b]/50 pb-2 flex items-center gap-1.5 uppercase tracking-wide">
+                Step-by-Step Method
+              </h2>
+              <ol className="list-decimal list-inside space-y-3.5 text-[#475569] dark:text-[#94a3b8] text-sm">
+                {topic.stepByStepMethod.map((step, i) => (
+                  <li key={i} className="pl-1 leading-relaxed"><TextWithMath text={step} /></li>
+                ))}
+              </ol>
+            </section>
+
+            {/* Solved Examples */}
+            <section className="space-y-4">
+              <h2 className="text-xl font-black text-[#0f172a] dark:text-[#f8fafc] uppercase tracking-wide flex items-center gap-2">
+                Solved Examples
+              </h2>
+              {topic.solvedExamples.map((ex, i) => (
+                <SolvedExample key={i} title={ex.title} problem={ex.problem} solution={ex.solution} />
+              ))}
+            </section>
+
+            {/* Upgraded Practice Section */}
+            <section className="bg-white dark:bg-[#0f1b2e] rounded-2xl border border-zinc-200 dark:border-[#1e293b] overflow-hidden shadow-sm">
+              <div className="bg-zinc-50 dark:bg-[#0f1b2e]/60 px-6 py-4 border-b border-zinc-200 dark:border-[#1e293b] flex flex-wrap justify-between items-center gap-4">
+                <h2 className="text-base font-black text-[#0f172a] dark:text-[#f8fafc] uppercase tracking-wide flex items-center gap-2">
+                  <HelpCircle size={18} className="text-indigo-600 dark:text-[#22d3ee]" /> Practice Sandbox
+                </h2>
+                {/* Difficulty Tabs */}
+                <div className="flex bg-zinc-100 dark:bg-zinc-950 p-1 rounded-xl border border-zinc-200 dark:border-zinc-800">
+                  {(['easy', 'medium', 'hard'] as const).map((diff) => (
+                    <button
+                      key={diff}
+                      onClick={() => setPracticeDiff(diff)}
+                      className={`px-3 py-1 text-xs font-bold rounded-lg uppercase tracking-wider transition-all cursor-pointer ${
+                        practiceDiff === diff
+                          ? 'bg-white dark:bg-[#0f1b2e] text-[#0f172a] dark:text-[#22d3ee] shadow-sm border border-zinc-200/50 dark:border-[#1e293b]/50'
+                          : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-[#f8fafc]'
+                      }`}
                     >
-                      {showSolution ? <EyeOff size={14} /> : <Eye size={14} />}
-                      {showSolution ? 'Hide Solution' : 'Check Answer & Steps'}
+                      {diff}
                     </button>
-                  </div>
-                  
-                  {showSolution && (
-                    <div className="mt-4 pt-4 border-t border-zinc-100 dark:border-[#1e293b]/50 animate-in fade-in duration-300">
-                      <h5 className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase mb-2">Calculus Breakdown</h5>
-                      <div className="bg-zinc-50 dark:bg-zinc-950/70 p-4 rounded-xl text-sm leading-relaxed border border-zinc-200 dark:border-[#1e293b] font-mono overflow-x-auto">
-                        <MathRenderer math={activeQuestion.solution} />
-                      </div>
-                    </div>
-                  )}
+                  ))}
                 </div>
               </div>
-            </div>
-          </section>
-
-          {/* Calculators rendered for specific subtopics */}
-          {topic.id === 'binomial' && (
-            <section className="space-y-4">
-              <h2 className="text-xl font-black text-[#0f172a] dark:text-[#f8fafc] uppercase tracking-wide flex items-center gap-2">
-                Binomial Calculator
-              </h2>
-              <BinomialCalculator />
-            </section>
-          )}
-
-          {topic.id === 'pmf-pdf-cdf' && (
-            <section className="space-y-4">
-              <h2 className="text-xl font-black text-[#0f172a] dark:text-[#f8fafc] uppercase tracking-wide flex items-center gap-2">
-                CDF Visual Builder
-              </h2>
-              <CDFBuilder />
-            </section>
-          )}
-
-          {topic.id === 'expectation-variance' && (
-            <section className="space-y-4">
-              <h2 className="text-xl font-black text-[#0f172a] dark:text-[#f8fafc] uppercase tracking-wide flex items-center gap-2">
-                PMF & Expectation Sandbox
-              </h2>
-              <PMFCalculator />
-            </section>
-          )}
-
-        </div>
-        
-        {/* Right Sidebar Columns */}
-        <div className="space-y-6">
-          
-          {/* Quick Info Box */}
-          <section className="bg-indigo-50/50 dark:bg-[#0f1b2e]/60 rounded-2xl p-5 border border-indigo-100/50 dark:border-[#1e293b] shadow-sm">
-            <h3 className="font-extrabold text-[#4f46e5] dark:text-[#22d3ee] mb-2 uppercase tracking-widest text-xs flex items-center gap-1">
-              <Info size={14} /> When to use it
-            </h3>
-            <p className="text-[#475569] dark:text-[#94a3b8] text-sm leading-relaxed font-medium">{topic.whenToUse}</p>
-          </section>
-          
-          {/* Common Mistakes */}
-          <section className="bg-red-50/50 dark:bg-red-950/10 rounded-2xl p-5 border border-red-100/30 dark:border-red-950/20">
-            <h3 className="font-extrabold text-red-700 dark:text-red-400 mb-3 uppercase tracking-widest text-xs flex items-center gap-1">
-              <AlertTriangle size={14} /> Common Pitfalls
-            </h3>
-            <ul className="space-y-3.5">
-              {topic.commonMistakes.map((mistake, i) => (
-                <li key={i} className="text-sm text-[#475569] dark:text-[#94a3b8] leading-relaxed flex items-start gap-2">
-                  <span className="text-red-500 mt-1 shrink-0">•</span>
-                  <span><TextWithMath text={mistake} /></span>
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          {/* Formulas List for Topic */}
-          {topicFormulas.length > 0 && (
-            <section className="bg-white dark:bg-[#0f1b2e] rounded-2xl border border-zinc-200 dark:border-[#1e293b] overflow-hidden shadow-sm">
-              <div className="bg-zinc-50 dark:bg-[#0f1b2e]/60 px-5 py-3.5 font-bold text-sm text-[#0f172a] dark:text-[#f8fafc] border-b border-zinc-200 dark:border-[#1e293b] uppercase tracking-wide flex items-center gap-1.5">
-                <BookOpen size={16} className="text-indigo-600 dark:text-[#22d3ee]" /> Essential Cheat Sheet
-              </div>
-              <div className="divide-y divide-zinc-100 dark:divide-[#1e293b]/50">
-                {topicFormulas.map(f => (
-                  <div key={f.id} className="p-5 flex flex-col gap-3 relative group/formula">
-                    <div className="absolute top-3 right-3 opacity-0 group-hover/formula:opacity-100 transition-opacity">
-                      <CopyButton text={f.expression} />
+              
+              <div className="p-6 space-y-6">
+                <div className="flex gap-4 items-start">
+                  {/* Completion Check Circle */}
+                  <button 
+                    onClick={togglePracCompleted}
+                    className={`mt-1 flex-shrink-0 transition-colors cursor-pointer ${
+                      isCompletedState 
+                        ? 'text-emerald-500' 
+                        : 'text-zinc-300 hover:text-zinc-400 dark:text-zinc-700 dark:hover:text-zinc-650'
+                    }`}
+                    title={isCompletedState ? 'Mark as incomplete' : 'Mark as complete'}
+                  >
+                    {isCompletedState ? <CheckCircle size={24} /> : <Circle size={24} />}
+                  </button>
+                  
+                  <div className="flex-1 min-w-0 space-y-4">
+                    <div className="text-sm font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest flex items-center gap-1.5">
+                      Difficulty level: 
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full border ${
+                        practiceDiff === 'hard' 
+                          ? 'bg-red-500/10 text-red-650 dark:text-red-400 border-red-500/10' 
+                          : practiceDiff === 'medium'
+                            ? 'bg-amber-500/10 text-amber-600 dark:text-[#f59e0b] border-amber-500/10'
+                            : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-450 border-emerald-500/10'
+                      }`}>
+                        {practiceDiff}
+                      </span>
                     </div>
-                    <div className="bg-zinc-950 p-4 rounded-xl flex items-center justify-center border border-zinc-200 dark:border-zinc-900 overflow-x-auto w-full">
-                      <MathRenderer math={f.expression} className="text-[#22d3ee] font-mono" />
+                    <div className="text-sm text-[#0f172a] dark:text-[#f8fafc] leading-relaxed font-semibold">
+                      <TextWithMath text={activeQuestion.text} />
                     </div>
-                    <span className="text-xs font-bold text-[#475569] dark:text-[#94a3b8] text-center">{f.title}</span>
+                    
+                    <div className="pt-2">
+                      <button 
+                        onClick={() => setShowSolution(!showSolution)}
+                        className="inline-flex items-center gap-1 text-xs font-bold text-[#4f46e5] dark:text-[#22d3ee] hover:underline cursor-pointer"
+                      >
+                        {showSolution ? <EyeOff size={14} /> : <Eye size={14} />}
+                        {showSolution ? 'Hide Solution' : 'Check Answer & Steps'}
+                      </button>
+                    </div>
+                    
+                    {showSolution && (
+                      <div className="mt-4 pt-4 border-t border-zinc-100 dark:border-[#1e293b]/50 animate-in fade-in duration-300">
+                        <h5 className="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase mb-2">Calculus Breakdown</h5>
+                        <div className="bg-zinc-50 dark:bg-zinc-950/70 p-4 rounded-xl text-sm leading-relaxed border border-zinc-200 dark:border-[#1e293b] font-mono overflow-x-auto">
+                          <MathRenderer math={activeQuestion.solution} />
+                        </div>
+                      </div>
+                    )}
                   </div>
-                ))}
+                </div>
               </div>
             </section>
-          )}
+
+            {/* Calculators rendered for specific subtopics */}
+            {topic.id === 'binomial' && (
+              <section className="space-y-4">
+                <h2 className="text-xl font-black text-[#0f172a] dark:text-[#f8fafc] uppercase tracking-wide flex items-center gap-2">
+                  Binomial Calculator
+                </h2>
+                <BinomialCalculator />
+              </section>
+            )}
+
+            {topic.id === 'pmf-pdf-cdf' && (
+              <section className="space-y-4">
+                <h2 className="text-xl font-black text-[#0f172a] dark:text-[#f8fafc] uppercase tracking-wide flex items-center gap-2">
+                  CDF Visual Builder
+                </h2>
+                <CDFBuilder />
+              </section>
+            )}
+
+            {topic.id === 'expectation-variance' && (
+              <section className="space-y-4">
+                <h2 className="text-xl font-black text-[#0f172a] dark:text-[#f8fafc] uppercase tracking-wide flex items-center gap-2">
+                  PMF & Expectation Sandbox
+                </h2>
+                <PMFCalculator />
+              </section>
+            )}
+
+          </div>
+          
+          {/* Right Sidebar Columns */}
+          <div className="space-y-6">
+            
+            {/* Quick Info Box */}
+            <section className="bg-indigo-50/50 dark:bg-[#0f1b2e]/60 rounded-2xl p-5 border border-indigo-100/50 dark:border-[#1e293b] shadow-sm">
+              <h3 className="font-extrabold text-[#4f46e5] dark:text-[#22d3ee] mb-2 uppercase tracking-widest text-xs flex items-center gap-1">
+                <Info size={14} /> When to use it
+              </h3>
+              <p className="text-[#475569] dark:text-[#94a3b8] text-sm leading-relaxed font-medium">{topic.whenToUse}</p>
+            </section>
+            
+            {/* Common Mistakes */}
+            <section className="bg-red-50/50 dark:bg-red-950/10 rounded-2xl p-5 border border-red-100/30 dark:border-red-950/20">
+              <h3 className="font-extrabold text-red-700 dark:text-red-400 mb-3 uppercase tracking-widest text-xs flex items-center gap-1">
+                <AlertTriangle size={14} /> Common Pitfalls
+              </h3>
+              <ul className="space-y-3.5">
+                {topic.commonMistakes.map((mistake, i) => (
+                  <li key={i} className="text-sm text-[#475569] dark:text-[#94a3b8] leading-relaxed flex items-start gap-2">
+                    <span className="text-red-500 mt-1 shrink-0">•</span>
+                    <span><TextWithMath text={mistake} /></span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            {/* Formulas List for Topic */}
+            {topicFormulas.length > 0 && (
+              <section className="bg-white dark:bg-[#0f1b2e] rounded-2xl border border-zinc-200 dark:border-[#1e293b] overflow-hidden shadow-sm">
+                <div className="bg-zinc-50 dark:bg-[#0f1b2e]/60 px-5 py-3.5 font-bold text-sm text-[#0f172a] dark:text-[#f8fafc] border-b border-zinc-200 dark:border-[#1e293b] uppercase tracking-wide flex items-center gap-1.5">
+                  <BookOpen size={16} className="text-indigo-600 dark:text-[#22d3ee]" /> Essential Cheat Sheet
+                </div>
+                <div className="divide-y divide-zinc-100 dark:divide-[#1e293b]/50">
+                  {topicFormulas.map(f => (
+                    <div key={f.id} className="p-5 flex flex-col gap-3 relative group/formula">
+                      <div className="absolute top-3 right-3 opacity-0 group-hover/formula:opacity-100 transition-opacity">
+                        <CopyButton text={f.expression} />
+                      </div>
+                      <div className="bg-zinc-950 p-4 rounded-xl flex items-center justify-center border border-zinc-200 dark:border-zinc-900 overflow-x-auto w-full">
+                        <MathRenderer math={f.expression} className="text-[#22d3ee] font-mono" />
+                      </div>
+                      <span className="text-xs font-bold text-[#475569] dark:text-[#94a3b8] text-center">{f.title}</span>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* LaTeX Styled Printable View */}
+      <PrintableNotesView 
+        topic={topic}
+        topicFormulas={topicFormulas}
+        theorems={topicTheorems[topic.id]}
+      />
+    </>
   );
 };
 

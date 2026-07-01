@@ -93,7 +93,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       const topic = topics.find(t => t.id === topicId);
       
       const searchParams = new URLSearchParams(location.search);
-      const subtopicName = searchParams.get('subtopic');
+      const subtopicNameRaw = searchParams.get('subtopic');
+      const subtopicName = subtopicNameRaw ? decodeURIComponent(subtopicNameRaw) : null;
       const unitNum = searchParams.get('unit');
       
       let unit = null;
@@ -292,7 +293,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         </header>
 
-        <main className="flex-1 p-4 lg:p-8 max-w-5xl mx-auto w-full relative z-10 flex flex-col">
+        <main className="flex-1 p-4 lg:p-8 max-w-7xl mx-auto w-full relative z-10 flex flex-col">
           {/* Breadcrumbs */}
           {crumbs.length > 0 && (
             <nav className="flex items-center gap-1.5 text-xs text-[#475569] dark:text-[#94a3b8] mb-6 bg-white/40 dark:bg-[#0f1b2e]/30 px-3.5 py-2 rounded-xl border border-zinc-200/50 dark:border-[#1e293b]/50 backdrop-blur-sm self-start inline-flex shadow-sm">

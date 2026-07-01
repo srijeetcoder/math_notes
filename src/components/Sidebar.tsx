@@ -21,10 +21,7 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed = false }) => {
   const { syllabusProgress } = useUser();
   const location = useLocation();
-  const [expandedUnits, setExpandedUnits] = useState<Record<string, boolean>>(() => {
-    // Expand Unit 1 by default for a friendly open feel
-    return { 'unit-1-basic-probability': true };
-  });
+  const [expandedUnits, setExpandedUnits] = useState<Record<string, boolean>>({});
 
   const toggleUnit = (unitId: string) => {
     setExpandedUnits(prev => ({
@@ -129,6 +126,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed
                     {isExpanded && (
                       <div className="pl-3 border-l border-zinc-200 dark:border-[#1e293b] ml-4 py-1 space-y-1 animate-in slide-in-from-top-1 duration-200">
                         {unit.topics.map((topic, i) => {
+                          const hasSamePrev = i > 0 && topic.topicId && unit.topics[i-1].topicId === topic.topicId;
+                          const hasSameNext = i < unit.topics.length - 1 && topic.topicId && unit.topics[i+1].topicId === topic.topicId;
+                          const isLinked = !!(topic.topicId && (hasSamePrev || hasSameNext));
+
+                          let content = null;
                           if (topic.topicId) {
                             const searchParams = new URLSearchParams(location.search);
                             const currentSubtopic = searchParams.get('subtopic');
@@ -137,10 +139,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed
                               (!currentSubtopic || currentSubtopic === topic.name) && 
                               (!currentUnit || parseInt(currentUnit) === unit.number);
 
-                            return (
+                            content = (
                               <NavLink
-                                key={i}
-                                to={`/topic/${topic.topicId}?subtopic=${encodeURIComponent(topic.name)}&unit=${unit.number}`}
+                                to={`/topic/${topic.topicId}?subtopic=${topic.name}&unit=${unit.number}`}
                                 onClick={() => setIsOpen(false)}
                                 className={() => 
                                   `block px-3 py-1.5 rounded-lg text-xs transition-all ${
@@ -154,9 +155,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed
                               </NavLink>
                             );
                           } else {
-                            return (
+                            content = (
                               <span 
-                                key={i} 
                                 className="block px-3 py-1.5 text-xs text-zinc-400 dark:text-[#94a3b8]/50 select-none font-sans"
                                 title="Topic details coming soon"
                               >
@@ -164,6 +164,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, isCollapsed
                               </span>
                             );
                           }
+
+                          return (
+                            <div key={i} className="relative">
+                              {isLinked && (
+                                <div className="absolute left-[-13px] top-0 bottom-0 w-[2px] flex flex-col items-center pointer-events-none z-10">
+                                  {/* Top connector line */}
+                                  <div className={`w-[2px] flex-1 ${hasSamePrev ? 'bg-indigo-500 dark:bg-cyan-400' : 'bg-transparent'}`} />
+                                  {/* Center node dot */}
+                                  <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 dark:bg-cyan-400 shrink-0" />
+                                  {/* Bottom connector line */}
+                                  <div className={`w-[2px] flex-1 ${hasSameNext ? 'bg-indigo-500 dark:bg-cyan-400' : 'bg-transparent'}`} />
+                                </div>
+                              )}
+                              {content}
+                            </div>
+                          );
                         })}
                       </div>
                     )}

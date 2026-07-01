@@ -240,7 +240,7 @@ export const Dashboard: React.FC = () => {
                               priority={fullTopic.priority}
                               status={status}
                               estimatedTime={fullTopic.priority === 'High' ? '60 min' : fullTopic.priority === 'Medium' ? '45 min' : '30 min'}
-                              onOpenNotes={() => navigate(`/topic/${fullTopic.id}?subtopic=${encodeURIComponent(topicItem.name)}&unit=${unit.number}`)}
+                              onOpenNotes={() => navigate(`/topic/${fullTopic.id}?subtopic=${topicItem.name}&unit=${unit.number}`)}
                             />
                           );
                         } else {
