@@ -154,7 +154,19 @@
     print-color-adjust: exact !important;
   }
 
-  /* Override dark mode text/math colors for white paper printing */
+  /* Override dark mode text/math colors for white paper printing - force black */
+  .print-only, .print-only * {
+    color: black !important;
+  }
+  .print-subsection-title, .print-subsection-title * {
+    color: #0056b3 !important;
+  }
+  .print-header, .print-header * {
+    color: #333333 !important;
+  }
+  .print-last-page-footer, .print-last-page-footer * {
+    color: #333333 !important;
+  }
   .katex, .katex * {
     color: black !important;
     background: transparent !important;
@@ -225,8 +237,6 @@
   .print-section {
     margin-top: 24pt;
     margin-bottom: 12pt;
-    page-break-inside: avoid;
-    break-inside: avoid-page;
   }
 
   .print-section-title {
