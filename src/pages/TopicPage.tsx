@@ -240,7 +240,7 @@ const PrintableNotesView: React.FC<{
 
       {/* Section 3: Step-by-Step Method */}
       {topic.stepByStepMethod && topic.stepByStepMethod.length > 0 && (
-        <div className="print-section print-prevent-split">
+        <div className="print-section">
           <h2 className="print-section-title font-sans">
             {sectionIndex++} Step-by-Step Method
           </h2>
@@ -257,7 +257,7 @@ const PrintableNotesView: React.FC<{
 
       {/* Section 4: Key Formulas Cheat Sheet */}
       {topicFormulas && topicFormulas.length > 0 && (
-        <div className="print-section print-prevent-split">
+        <div className="print-section">
           <h2 className="print-section-title font-sans">
             {sectionIndex++} Key Formulas Cheat Sheet
           </h2>
@@ -276,7 +276,7 @@ const PrintableNotesView: React.FC<{
 
       {/* Section 6: Common Pitfalls & Mistakes */}
       {topic.commonMistakes && topic.commonMistakes.length > 0 && (
-        <div className="print-section print-prevent-split">
+        <div className="print-section">
           <h2 className="print-section-title font-sans">
             {sectionIndex++} Common Pitfalls & Mistakes
           </h2>
