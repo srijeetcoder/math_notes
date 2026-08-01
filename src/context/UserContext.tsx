@@ -66,6 +66,24 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const checkUser = async () => {
       try {
+        // Adopt session tokens from URL hash or query params
+        const hash = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+        const query = new URLSearchParams(window.location.search);
+        const accessToken = hash.get('access_token') ?? query.get('access_token');
+        const refreshToken = hash.get('refresh_token') ?? query.get('refresh_token');
+
+        if (accessToken && refreshToken) {
+          try {
+            await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken,
+            });
+            window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
+          } catch (err) {
+            console.error('[auth] Failed to adopt session:', err);
+          }
+        }
+
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
           setUser(session.user);

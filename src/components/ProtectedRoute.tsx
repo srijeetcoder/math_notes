@@ -22,7 +22,10 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (!user) {
-    return <Navigate to={import.meta.env.DEV ? "/auth" : "/"} replace />;
+    if (typeof window !== 'undefined') {
+      window.location.replace('http://localhost:3000/?next=' + encodeURIComponent(window.location.origin + window.location.pathname));
+    }
+    return null;
   }
 
   return <>{children}</>;
