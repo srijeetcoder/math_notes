@@ -6,7 +6,6 @@ import { TopicPage } from './pages/TopicPage';
 import { Practice } from './pages/Practice';
 import { QuizPage } from './pages/QuizPage';
 import { RevisionPlanPage } from './pages/RevisionPlanPage';
-import { Auth } from './pages/Auth';
 import { LandingPage } from './pages/LandingPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { UserProvider } from './context/UserContext';
