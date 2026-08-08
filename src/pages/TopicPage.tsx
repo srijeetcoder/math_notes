@@ -8,6 +8,8 @@ import { BinomialCalculator } from '../components/BinomialCalculator';
 import { PMFCalculator, CDFBuilder } from '../components/Calculators';
 import { CheckCircle, Circle, Eye, EyeOff, Info, Award, HelpCircle, BookOpen, AlertTriangle, Download } from 'lucide-react';
 import { CopyButton } from '../components/ContentCards';
+import { useUser } from '../context/UserContext';
+import { supabase } from '../services/supabase';
 
 // Theorems Database
 const topicTheorems: Record<string, { title: string; statement: string; proof: string; example: string }[]> = {
@@ -301,12 +303,28 @@ const PrintableNotesView: React.FC<{
 
 const TopicPageContent: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const { user } = useUser();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const subtopicNameRaw = searchParams.get('subtopic');
   const subtopicName = subtopicNameRaw ? decodeURIComponent(subtopicNameRaw) : null;
   const topic = topics.find(t => t.id === id);
   const topicFormulas = formulas.filter(f => f.topicId === id);
+
+  useEffect(() => {
+    if (user && topic) {
+      supabase.from('study_history').insert({
+        user_id: user.id,
+        subject_id: 'bsm-201',
+        subject_title: 'Mathematics-II',
+        topic_title: topic.title,
+        url: window.location.href,
+        timestamp: new Date().toISOString()
+      }).then(({ error }) => {
+        if (error) console.error('[history] Error logging Math note study:', error);
+      });
+    }
+  }, [user, topic]);
   
   const [isRevised, setIsRevised] = useState(() => {
     if (!id) return false;
